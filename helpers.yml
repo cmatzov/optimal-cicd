@@ -1,0 +1,120 @@
+# stages:
+#     - test
+#     - build-tag
+#     - run
+#     - deploy
+
+# variables: 
+#     PROJECT: ""
+
+# before_script:
+#     - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD 
+#     - PROJECT_URL=$(echo $CI_PROJECT_URL | sed 's/http:\/\///')
+#     - git remote set-url origin https://oauth2:$GITLAB_TOKEN@$PROJECT_URL.git
+
+.change_ikea:
+    stage: build-tag
+    only:
+         changes: 
+            - ikea/**/*
+    script:
+        - VERSION=$(git tag -l | grep ikea | sort -V | tail -1)
+        - PROJECT="${VERSION:0:4}"
+        - MAJOR="${VERSION:6:1}"
+        - MINOR="${VERSION:8:1}"
+        - PATCH="${VERSION:10}"
+        - PATCH_NEW=$(($PATCH+1))
+        - NEWEST_TAG="$PROJECT-v$MAJOR.$MINOR.$PATCH_NEW"
+        - git tag $NEWEST_TAG
+        - git push origin $NEWEST_TAG
+
+.change_verila:
+    stage: build-tag
+    only:
+         changes: 
+            - verila/**/*
+    script:
+        - VERSION=$(git tag -l | grep verila | sort -V | tail -1)
+        - PROJECT="${VERSION:0:6}"
+        - MAJOR="${VERSION:8:1}"
+        - MINOR="${VERSION:10:1}"
+        - PATCH="${VERSION:12}"
+        - PATCH_NEW=$(($PATCH+1))
+        - NEWEST_TAG="$PROJECT-v$MAJOR.$MINOR.$PATCH_NEW"
+        - git tag $NEWEST_TAG
+        - git push origin $NEWEST_TAG
+
+.change_vinivel:
+    stage: build-tag
+    only:
+         changes: 
+            - vinivel/**/*
+    script:
+        - VERSION=$(git tag -l | grep vinivel | sort -V | tail -1)
+        - PROJECT="${VERSION:0:7}"
+        - MAJOR="${VERSION:9:1}"
+        - MINOR="${VERSION:11:1}"
+        - PATCH="${VERSION:13}"
+        - PATCH_NEW=$(($PATCH+1))
+        - NEWEST_TAG="$PROJECT-v$MAJOR.$MINOR.$PATCH_NEW"
+        - git tag $NEWEST_TAG
+        - git push origin $NEWEST_TAG
+
+.run_ikea:
+    stage: run
+    script: 
+        - NEW_VERSION=$(git tag -l | grep ikea | sort -V | tail -1)
+        - echo $NEW_VERSION
+        - docker-compose --project-directory ./ikea build
+        - docker tag ikea_app kristian88/test:$NEW_VERSION
+        - docker push kristian88/test:$NEW_VERSION
+        - docker pull kristian88/test:"$NEW_VERSION" 
+        - docker run -d -p 2346:80 --name ikea kristian88/test:"$NEW_VERSION"
+    only:
+         changes: 
+            - ikea/**/*
+
+.run_vinivel:
+    stage: run
+    script: 
+        - NEW_VERSION=$(git tag -l | grep vinivel | sort -V | tail -1)
+        - echo $NEW_VERSION
+        - docker-compose --project-directory ./vinivel build
+        - docker tag vinivel_app kristian88/test:$NEW_VERSION
+        - docker push kristian88/test:$NEW_VERSION
+        - docker pull kristian88/test:"$NEW_VERSION" 
+        - docker run -d -p 2346:80 --name vinviel kristian88/test:"$NEW_VERSION"
+    only:
+         changes: 
+            - vinivel/**/*
+
+.run_verila:
+    stage: run
+    script: 
+        - NEW_VERSION=$(git tag -l | grep verila | sort -V | tail -1)
+        - echo $NEW_VERSION
+        - docker-compose --project-directory ./verila build
+        - docker tag verila_app kristian88/test:$NEW_VERSION
+        - docker push kristian88/test:$NEW_VERSION
+        - docker pull kristian88/test:"$NEW_VERSION" 
+        - docker run -d -p 2346:80 --name verila kristian88/test:"$NEW_VERSION"
+    only:
+         changes: 
+            - verila/**/*
+            
+.deploy:
+    stage: deploy
+    script:
+        - NEW_VERSION=$(git tag -l | grep ikea | sort -V | tail -1)
+        - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD
+        - docker pull kristian88/test:"$NEW_VERSION"
+        - docker run -d -p 2346:80 --name clickme kristian88/test:"$NEW_VERSION"
+    rules:    
+        - if: '$GITLAB_USER_LOGIN =~ /^(veselin.gizdov)|(cristian.matzov)$/'
+    when: manual
+    tags: 
+        - deploy
+
+###
+### File update to helpers in order to simplify .gitlab-ci.yml
+###
