@@ -4,15 +4,7 @@
 #     - run
 #     - deploy
 
-# variables: 
-#     PROJECT: ""
-
-# before_script:
-#     - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD 
-#     - PROJECT_URL=$(echo $CI_PROJECT_URL | sed 's/http:\/\///')
-#     - git remote set-url origin https://oauth2:$GITLAB_TOKEN@$PROJECT_URL.git
-
-.change_ikea:
+change_ikea:
     stage: build-tag
     only:
          changes: 
@@ -28,7 +20,7 @@
         - git tag $NEWEST_TAG
         - git push origin $NEWEST_TAG
 
-.change_verila:
+change_verila:
     stage: build-tag
     only:
          changes: 
@@ -44,7 +36,7 @@
         - git tag $NEWEST_TAG
         - git push origin $NEWEST_TAG
 
-.change_vinivel:
+change_vinivel:
     stage: build-tag
     only:
          changes: 
@@ -60,7 +52,7 @@
         - git tag $NEWEST_TAG
         - git push origin $NEWEST_TAG
 
-.run_ikea:
+run_ikea:
     stage: run
     script: 
         - NEW_VERSION=$(git tag -l | grep ikea | sort -V | tail -1)
@@ -74,7 +66,7 @@
          changes: 
             - ikea/**/*
 
-.run_vinivel:
+run_vinivel:
     stage: run
     script: 
         - NEW_VERSION=$(git tag -l | grep vinivel | sort -V | tail -1)
@@ -88,7 +80,7 @@
          changes: 
             - vinivel/**/*
 
-.run_verila:
+run_verila:
     stage: run
     script: 
         - NEW_VERSION=$(git tag -l | grep verila | sort -V | tail -1)
@@ -102,7 +94,7 @@
          changes: 
             - verila/**/*
             
-.deploy:
+deploy:
     stage: deploy
     script:
         - NEW_VERSION=$(git tag -l | grep ikea | sort -V | tail -1)
