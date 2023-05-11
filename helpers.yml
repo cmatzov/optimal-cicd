@@ -110,7 +110,7 @@ run_verila:
          changes: 
             - verila/**/*
 
-run_all:
+run_shared:
     stage: run
     script:
         - NEW_VERSION=$(git tag -l | grep novus | sort -V | tail -1)
