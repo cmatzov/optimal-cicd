@@ -52,7 +52,7 @@ change_vinivel:
         - git tag $NEWEST_TAG
         - git push origin $NEWEST_TAG
 
-change_all:
+change_shared:
     stage: build-tag
     only:
         changes:
