@@ -52,6 +52,22 @@ change_vinivel:
         - git tag $NEWEST_TAG
         - git push origin $NEWEST_TAG
 
+change_all:
+    stage: build-tag
+    only:
+        changes:
+            - shared/**/*
+    script:
+        - VERSION=$(git tag -l | grep novus | sort -V | tail -1)
+        - PROJECT="${VERSION:0:5}"
+        - MAJOR="${VERSION:7:1}"
+        - MINOR="${VERSION:9:1}"
+        - PATCH="${VERSION:11}"
+        - PATCH_NEW=$(($PATCH+1))
+        - NEWEST_TAG="$PROJECT-v$MAJOR.$MINOR.$PATCH_NEW"
+        - git tag $NEWEST_TAG
+        - git push origin $NEWEST_TAG
+
 run_ikea:
     stage: run
     script: 
@@ -61,7 +77,7 @@ run_ikea:
         - docker tag ikea_app kristian88/test:$NEW_VERSION
         - docker push kristian88/test:$NEW_VERSION
         - docker pull kristian88/test:"$NEW_VERSION" 
-        - docker run -d -p 2346:80 --name ikea kristian88/test:"$NEW_VERSION"
+        - docker run -d -p 2347:80 --name ikea kristian88/test:"$NEW_VERSION"
     only:
          changes: 
             - ikea/**/*
@@ -89,11 +105,35 @@ run_verila:
         - docker tag verila_app kristian88/test:$NEW_VERSION
         - docker push kristian88/test:$NEW_VERSION
         - docker pull kristian88/test:"$NEW_VERSION" 
-        - docker run -d -p 2346:80 --name verila kristian88/test:"$NEW_VERSION"
+        - docker run -d -p 2345:80 --name verila kristian88/test:"$NEW_VERSION"
     only:
          changes: 
             - verila/**/*
-            
+
+run_all:
+    stage: run
+    script:
+        - NEW_VERSION=$(git tag -l | grep novus | sort -V | tail -1)
+        - echo $NEW_VERSION
+        - docker-compose --project-directory ./verila build
+        - docker tag verila_app kristian88/test:$NEW_VERSION
+        - docker push kristian88/test:$NEW_VERSION
+        - docker pull kristian88/test:"$NEW_VERSION" 
+        - docker run -d -p 2345:80 --name verila kristian88/test:"$NEW_VERSION"
+        - docker-compose --project-directory ./vinivel build
+        - docker tag vinivel_app kristian88/test:$NEW_VERSION
+        - docker push kristian88/test:$NEW_VERSION
+        - docker pull kristian88/test:"$NEW_VERSION" 
+        - docker run -d -p 2346:80 --name vinviel kristian88/test:"$NEW_VERSION"
+        - docker-compose --project-directory ./ikea build
+        - docker tag ikea_app kristian88/test:$NEW_VERSION
+        - docker push kristian88/test:$NEW_VERSION
+        - docker pull kristian88/test:"$NEW_VERSION" 
+        - docker run -d -p 2347:80 --name ikea kristian88/test:"$NEW_VERSION"
+    only:
+        changes:
+            - shared/**/*
+
 deploy:
     stage: deploy
     script:
