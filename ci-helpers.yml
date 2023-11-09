@@ -17,7 +17,6 @@
     - ./opt-test-db-restore.sh
 
 .anal_backend:
-  stage: build
   rules:
     - if:
       changes:
@@ -33,7 +32,6 @@
     - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
 
 .anal_frontend:
-  stage: build
   rules:
     - if:
       changes:
@@ -53,7 +51,6 @@
 .docker_ikea:
   tags: 
     - optimal-novus-runner
-  stage: docker
   script:
     - |
       docker build --arg project=ikea -f docker/server/Dockerfile -t ikea-server .
@@ -88,7 +85,6 @@
 .docker_verila:
   tags: 
     - optimal-novus-runner
-  stage: docker
   script:
     - |
       docker build --arg project=verila -f docker/server/Dockerfile -t verila-server .
