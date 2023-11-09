@@ -53,21 +53,6 @@
 .docker_ikea:
   tags: 
     - optimal-novus-runner
-  rules:
-    - if:
-      changes:
-        - ./net/ikea/**/*
-        - ./net/shared/**/*
-        - ./js/package.json
-        - ./js/apps/mobile/package.json
-        - ./js/apps/mobile/src/ikea/**/*
-        - ./js/apps/mobile/src/shared/**/*
-        - ./js/packages/common/package.json
-        - ./js/packages/common/src/ikea-api/**/*
-        - ./js/packages/common/src/shared/**/*
-        - ./js/packages/web/package.json
-        - ./js/packages/web/src/ikea/**/*
-        - ./js/packages/web/src/shared/**/*
   stage: docker
   script:
     - |
@@ -84,25 +69,25 @@
   artifacts:
     paths:
       - /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
+  rules:
+    - if:
+      changes:
+        - ./net/ikea/**/*
+        - ./net/shared/**/*
+        - ./js/package.json
+        - ./js/apps/mobile/package.json
+        - ./js/apps/mobile/src/ikea/**/*
+        - ./js/apps/mobile/src/shared/**/*
+        - ./js/packages/common/package.json
+        - ./js/packages/common/src/ikea-api/**/*
+        - ./js/packages/common/src/shared/**/*
+        - ./js/packages/web/package.json
+        - ./js/packages/web/src/ikea/**/*
+        - ./js/packages/web/src/shared/**/*
 
 .docker_verila:
   tags: 
     - optimal-novus-runner
-  rules:
-    - if:
-      changes:
-        - ./net/verila/**/*
-        - ./net/shared/**/*
-        - ./js/package.json
-        - ./js/apps/mobile/package.json
-        - ./js/apps/mobile/src/verila/**/*
-        - ./js/apps/mobile/src/shared/**/*
-        - ./js/packages/common/package.json
-        - ./js/packages/common/src/verila-api/**/*
-        - ./js/packages/common/src/shared/**/*
-        - ./js/packages/web/package.json
-        - ./js/packages/web/src/verila/**/*
-        - ./js/packages/web/src/shared/**/*
   stage: docker
   script:
     - |
@@ -119,3 +104,18 @@
   artifacts:
     paths:
       - /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
+  rules:
+    - if:
+      changes:
+        - ./net/verila/**/*
+        - ./net/shared/**/*
+        - ./js/package.json
+        - ./js/apps/mobile/package.json
+        - ./js/apps/mobile/src/verila/**/*
+        - ./js/apps/mobile/src/shared/**/*
+        - ./js/packages/common/package.json
+        - ./js/packages/common/src/verila-api/**/*
+        - ./js/packages/common/src/shared/**/*
+        - ./js/packages/web/package.json
+        - ./js/packages/web/src/verila/**/*
+        - ./js/packages/web/src/shared/**/*
