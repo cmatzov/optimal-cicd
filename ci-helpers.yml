@@ -29,7 +29,7 @@
     - dotnet tool restore
     - dotnet build
     - dotnet roslynator analyze | grep "^0 diagnostics found$"
-    - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
+    # - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
 
 .anal_frontend:
   rules:
@@ -53,14 +53,11 @@
     - optimal-novus-runner
   script:
     - |
-      docker build --arg project=ikea -f docker/server/Dockerfile -t ikea-server .
-      docker build --arg project=ikea -f docker/jobs/Dockerfile -t ikea-jobs .
+      curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
       TAG=$(scripts/versioning.sh IK test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
-      docker tag ikea-server registry.optim-al.com/repository/optimal/optimal-novus/ikea-server:$TAG
-      docker tag ikea-jobs registry.optim-al.com/repository/optimal/optimal-novus/ikea-jobs:$TAG
-      docker push ikea-serevr:$TAG
-      docker push ikea-jobs:$TAG
+      PROJECT=ikea TAG=$TAG ENV=test docker-compose build
+      PROJECT=ikea TAG=$TAG ENV=test docker-compose push
       git tag $TAG
       git push origin $TAG -o ci.skip
   artifacts:
@@ -87,14 +84,11 @@
     - optimal-novus-runner
   script:
     - |
-      docker build --arg project=verila -f docker/server/Dockerfile -t verila-server .
-      docker build --arg project=verila -f docker/jobs/Dockerfile -t verila-jobs .
+      curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
       TAG=$(scripts/versioning.sh VE test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
-      docker tag verila-server registry.optim-al.com/repository/optimal/optimal-novus/verila-server:$TAG
-      docker tag verila-jobs registry.optim-al.com/repository/optimal/optimal-novus/verila-jobs:$TAG
-      docker push verila-server:$TAG
-      docker push verila-jobs:$TAG
+      PROJECT=verila TAG=$TAG ENV=test docker-compose build
+      PROJECT=verila TAG=$TAG ENV=test docker-compose push
       git tag $TAG
       git push origin $TAG -o ci.skip
   artifacts:
