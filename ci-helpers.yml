@@ -18,6 +18,10 @@
 
 .anal_backend:
   stage: build
+  rules:
+    - if:
+      changes:
+        - ./net/**/*
   tags:
     - optimal-novus-runner
   image: mcr.microsoft.com/dotnet/sdk:6.0
@@ -30,6 +34,10 @@
 
 .anal_frontend:
   stage: build
+  rules:
+    - if:
+      changes:
+        - ./js/**/*
   tags:
     - optimal-novus-runner
   image: node:16
@@ -48,9 +56,18 @@
   rules:
     - if:
       changes:
-        - ./net/ikea
-        - ./net/shared
-  image: jpetazzo/dind
+        - ./net/ikea/**/*
+        - ./net/shared/**/*
+        - ./js/package.json
+        - ./js/apps/mobile/package.json
+        - ./js/apps/mobile/src/ikea/**/*
+        - ./js/apps/mobile/src/shared/**/*
+        - ./js/packages/common/package.json
+        - ./js/packages/common/src/ikea-api/**/*
+        - ./js/packages/common/src/shared/**/*
+        - ./js/packages/web/package.json
+        - ./js/packages/web/src/ikea/**/*
+        - ./js/packages/web/src/shared/**/*
   stage: docker
   script:
     - |
@@ -74,9 +91,18 @@
   rules:
     - if:
       changes:
-        - ./net/verila
-        - ./net/shared
-  image: jpetazzo/dind
+        - ./net/verila/**/*
+        - ./net/shared/**/*
+        - ./js/package.json
+        - ./js/apps/mobile/package.json
+        - ./js/apps/mobile/src/verila/**/*
+        - ./js/apps/mobile/src/shared/**/*
+        - ./js/packages/common/package.json
+        - ./js/packages/common/src/verila-api/**/*
+        - ./js/packages/common/src/shared/**/*
+        - ./js/packages/web/package.json
+        - ./js/packages/web/src/verila/**/*
+        - ./js/packages/web/src/shared/**/*
   stage: docker
   script:
     - |
