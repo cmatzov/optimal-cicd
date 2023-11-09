@@ -1,7 +1,8 @@
 .scheduled-clear:
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CLEAR_ENV == "yes"'
-  tags: optimal-novus-runner
+  tags: 
+    - optimal-novus-runner
   script:
     - chmod +x clear-sched.sh
     - ./clear-sched.sh
@@ -9,7 +10,8 @@
 .db_restore:
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $RESTORE_SCRIPT == "yes"'
-  tags: optimal-novus-runner
+  tags: 
+    - optimal-novus-runner
   script:
     - chmod +x opt-test-db-restore.sh
     - ./opt-test-db-restore.sh
@@ -41,7 +43,8 @@
     - npm run lint
 
 .docker_ikea:
-  tags: optima-novus-runner
+  tags: 
+    - optimal-novus-runner
   rules:
     - if:
       changes:
@@ -66,7 +69,8 @@
       - /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
 
 .docker_verila:
-  tags: optima-novus-runner
+  tags: 
+    - optimal-novus-runner
   rules:
     - if:
       changes:
