@@ -4,8 +4,8 @@
   tags: 
     - optimal-novus-runner
   script:
-    - chmod +x clear-sched.sh
-    - ./clear-sched.sh
+    - chmod +x scripts/clear-sched.sh
+    - scripts/clear-sched.sh
 
 .db_restore:
   rules: 
@@ -13,14 +13,14 @@
   tags: 
     - optimal-novus-runner
   script:
-    - chmod +x opt-test-db-restore.sh
-    - ./opt-test-db-restore.sh
+    - chmod +x scripts/opt-test-db-restore.sh
+    - scripts/opt-test-db-restore.sh
 
 .anal_backend:
   rules:
     - if:
       changes:
-        - ./net/**/*
+        - net/**/*
   tags:
     - optimal-novus-runner
   image: mcr.microsoft.com/dotnet/sdk:6.0
@@ -35,7 +35,7 @@
   rules:
     - if:
       changes:
-        - ./js/**/*
+        - js/**/*
   tags:
     - optimal-novus-runner
   image: node:16
@@ -55,7 +55,7 @@
     - |
       docker build --arg project=ikea -f docker/server/Dockerfile -t ikea-server .
       docker build --arg project=ikea -f docker/jobs/Dockerfile -t ikea-jobs .
-      TAG=$(./versioning.sh IK test)
+      TAG=$(scripts/versioning.sh IK test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
       docker tag ikea-server registry.optim-al.com/repository/optimal/optimal-novus/ikea-server:$TAG
       docker tag ikea-jobs registry.optim-al.com/repository/optimal/optimal-novus/ikea-jobs:$TAG
@@ -69,18 +69,18 @@
   rules:
     - if:
       changes:
-        - ./net/ikea/**/*
-        - ./net/shared/**/*
-        - ./js/package.json
-        - ./js/apps/mobile/package.json
-        - ./js/apps/mobile/src/ikea/**/*
-        - ./js/apps/mobile/src/shared/**/*
-        - ./js/packages/common/package.json
-        - ./js/packages/common/src/ikea-api/**/*
-        - ./js/packages/common/src/shared/**/*
-        - ./js/packages/web/package.json
-        - ./js/packages/web/src/ikea/**/*
-        - ./js/packages/web/src/shared/**/*
+        - net/ikea/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/ikea/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/ikea-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/ikea/**/*
+        - js/packages/web/src/shared/**/*
 
 .docker_verila:
   tags: 
@@ -89,7 +89,7 @@
     - |
       docker build --arg project=verila -f docker/server/Dockerfile -t verila-server .
       docker build --arg project=verila -f docker/jobs/Dockerfile -t verila-jobs .
-      TAG=$(./versioning.sh VE test)
+      TAG=$(scripts/versioning.sh VE test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
       docker tag verila-server registry.optim-al.com/repository/optimal/optimal-novus/verila-server:$TAG
       docker tag verila-jobs registry.optim-al.com/repository/optimal/optimal-novus/verila-jobs:$TAG
@@ -103,16 +103,16 @@
   rules:
     - if:
       changes:
-        - ./net/verila/**/*
-        - ./net/shared/**/*
-        - ./js/package.json
-        - ./js/apps/mobile/package.json
-        - ./js/apps/mobile/src/verila/**/*
-        - ./js/apps/mobile/src/shared/**/*
-        - ./js/packages/common/package.json
-        - ./js/packages/common/src/verila-api/**/*
-        - ./js/packages/common/src/shared/**/*
-        - ./js/packages/web/package.json
-        - ./js/packages/web/src/verila/**/*
-        - ./js/packages/web/src/shared/**/*
+        - net/verila/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/verila/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/verila-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/verila/**/*
+        - js/packages/web/src/shared/**/*
 #
