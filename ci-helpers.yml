@@ -2,7 +2,7 @@
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CLEAR_ENV == "yes"'
   tags: 
-    - novus-runner
+    - optimal-novus-runner
   script:
     - chmod +x scripts/clear-sched.sh
     - scripts/clear-sched.sh
@@ -11,7 +11,7 @@
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $RESTORE_SCRIPT == "yes"'
   tags: 
-    - novus-runner
+    - optimal-novus-runner
   script:
     - chmod +x scripts/opt-test-db-restore.sh
     - scripts/opt-test-db-restore.sh
@@ -22,7 +22,7 @@
       changes:
         - net/**/*
   tags:
-    - novus-runner
+    - optimal-novus-runner
   image: mcr.microsoft.com/dotnet/sdk:6.0
   script:
     - cd ./net
@@ -37,7 +37,7 @@
       changes:
         - js/**/*
   tags:
-    - novus-runner
+    - optimal-novus-runner
   image: node:16
   script:
     - cd js
@@ -50,7 +50,7 @@
 
 .docker_ikea:
   tags: 
-    - novus-runner
+    - optimal-novus-runner
   script:
     - |
       docker build --arg project=ikea -f docker/server/Dockerfile -t ikea-server .
@@ -84,7 +84,7 @@
 
 .docker_verila:
   tags: 
-    - novus-runner
+    - optimal-novus-runner
   script:
     - |
       docker build --arg project=verila -f docker/server/Dockerfile -t verila-server .
