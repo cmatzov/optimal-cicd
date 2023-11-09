@@ -54,14 +54,14 @@
       docker build --arg project=ikea -f docker/server/Dockerfile -t ikea-server .
       docker build --arg project=ikea -f docker/jobs/Dockerfile -t ikea-jobs .
       TAG=$(./versioning.sh IK test)
-      echo $TAG > /tmp/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
+      echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
       docker tag ikea-server registry.optim-al.com/repository/optimal/optimal-novus/ikea-server:$TAG
       docker tag ikea-jobs registry.optim-al.com/repository/optimal/optimal-novus/ikea-jobs:$TAG
       docker push ikea-serevr:$TAG
       docker push ikea-jobs:$TAG
   artifacts:
     paths:
-      - /tmp/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
+      - /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
 
 .docker_verila:
   tags: optima-novus-runner
@@ -77,89 +77,11 @@
       docker build --arg project=verila -f docker/server/Dockerfile -t verila-server .
       docker build --arg project=verila -f docker/jobs/Dockerfile -t verila-jobs .
       TAG=$(./versioning.sh VE test)
-      echo $TAG > /tmp/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
+      echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
       docker tag verila-server registry.optim-al.com/repository/optimal/optimal-novus/verila-server:$TAG
       docker tag verila-jobs registry.optim-al.com/repository/optimal/optimal-novus/verila-jobs:$TAG
       docker push verila-server:$TAG
       docker push verila-jobs:$TAG
   artifacts:
     paths:
-      - /tmp/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
-
-.deploy_test_ikea:
-  tags: optimal-novus-runner
-  when: manual
-  script:
-  - |
-    TAG=$(cat /tmp/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt)
-    rm -rf "/tmp/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt"
-    STATUS=$(./check-branch.sh IKEA)
-    if [ -z "STATUS" ]; then
-      CONTAINER=$(./check-status.sh)
-      if [ -z "$CONTAINER" ]; then
-        echo "All environments are busy"
-        exit 1
-      else
-        echo $CONTAINER > /tmp/runner/${CI_COMMIT_BRANCH}-IKEA.txt
-        echo "Deploying on $CONTAINER"
-        ./deploy.sh $CONTAINER IKEA $TAG
-      fi
-    else
-      echo "Deploying on $STATUS"
-      ./deploy.sh $STATUS IKEA $TAG
-    fi
-  artifacts:
-    paths:
-      - /tmp/runner/${CI_COMMIT_BRANCH}-IKEA.txt
-      - /tmp/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
-
-.deploy_test_verila:
-  tags: optimal-novus-runner
-  when: manual
-  script:
-  - |
-    TAG=$(cat /tmp/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt)
-    rm -rf "/tmp/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt"
-    STATUS=$(./check-branch.sh VERILA)
-    if [ -z "STATUS" ]; then
-      CONTAINER=$(./check-status.sh)
-      if [ -z "$CONTAINER" ]; then
-        echo "All environments are busy"
-        exit 1
-      else
-        echo $CONTAINER > /tmp/runner/${CI_COMMIT_BRANCH}-VERILA.txt
-        echo "Deploying on $CONTAINER"
-        ./deploy.sh $CONTAINER VERILA $TAG
-      fi
-    else
-      echo "Deploying on $STATUS"
-      ./deploy.sh $STATUS VERILA $TAG
-    fi
-  artifacts:
-    paths:
-      - /tmp/runner/${CI_COMMIT_BRANCH}-VERILA.txt
-      - /tmp/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
-
-.clear-env-ikea:
-  when: manual
-  tags: optimal-novus-runner
-  script:
-    - chmod +x clear-env.sh
-    - container_name=$(cat "/tmp/runner/${CI_COMMIT_BRANCH}-IKEA.txt")
-    - ./clear-env.sh $container_name
-    - rm -rf "/tmp/runner/${CI_COMMIT_BRANCH}-IKEA.txt"
-  artifacts:
-    paths:
-      - /tmp/runner/${CI_COMMIT_BRANCH}-IKEA.txt
-
-.clear-env-verila:
-  when: manual
-  tags: optimal-novus-runner
-  script:
-    - chmod +x clear-env.sh
-    - container_name=$(cat "/tmp/runner/${CI_COMMIT_BRANCH}-VERILA.txt")
-    - ./clear-env.sh $container_name
-    - rm -rf "/tmp/runner/${CI_COMMIT_BRANCH}-VERILA.txt"
-  artifacts:
-    paths:
-      - /tmp/runner/${CI_COMMIT_BRANCH}-VERILA.txt
+      - /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
