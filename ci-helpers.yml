@@ -59,6 +59,8 @@
       docker tag ikea-jobs registry.optim-al.com/repository/optimal/optimal-novus/ikea-jobs:$TAG
       docker push ikea-serevr:$TAG
       docker push ikea-jobs:$TAG
+      git tag $TAG
+      git push origin $TAG -o ci.skip
   artifacts:
     paths:
       - /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
@@ -82,6 +84,8 @@
       docker tag verila-jobs registry.optim-al.com/repository/optimal/optimal-novus/verila-jobs:$TAG
       docker push verila-server:$TAG
       docker push verila-jobs:$TAG
+      git tag $TAG
+      git push origin $TAG -o ci.skip
   artifacts:
     paths:
       - /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
