@@ -56,7 +56,7 @@
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       apk update
-      apk upgrade findutils
+      apk install findutils
       devops/pipelines/build/docker-tmp.sh
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
@@ -91,7 +91,7 @@
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       apk update
-      apk upgrade findutils
+      apk install findutils
       devops/pipelines/build/docker-tmp.sh
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
