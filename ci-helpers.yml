@@ -51,9 +51,7 @@
     - optimal-novus-runner
   script:
     - |
-      docker-compose --version
-      ls -l /automations/runner/
-      chmod +x /automations/runner/versioning.sh
+      git tag -l
       TAG=$(/bin/sh /automations/runner/versioning.sh IK test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
@@ -84,8 +82,7 @@
     - optimal-novus-runner
   script:
     - |
-      docker-compose --version
-      TAG=$(/automations/runner/versioning.sh VE test)
+      TAG=$(/bin/sh /automations/runner/versioning.sh VE test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
