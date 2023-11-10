@@ -4,7 +4,7 @@
   tags: 
     - optimal-novus-runner
   script:
-    - /automations/runner/scripts/clear-sched.sh
+    - /automations/runner/clear-sched.sh
 
 .db_restore:
   rules: 
@@ -12,7 +12,7 @@
   tags: 
     - optimal-novus-runner
   script:
-    - /automations/runner/scripts/opt-test-db-restore.sh
+    - /automations/runner/opt-test-db-restore.sh
 
 .anal_backend:
   rules:
@@ -52,7 +52,7 @@
   script:
     - |
       docker-compose --version
-      TAG=$(/automations/runner/scripts/versioning.sh IK test)
+      TAG=$(/automations/runner/versioning.sh IK test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
@@ -87,7 +87,7 @@
       chmod +x /usr/local/bin/docker-compose
       echo 'export PATH=$PATH:/usr/local/bin' >> $HOME/.bashrc
       docker-compose --version
-      TAG=$(/automations/runner/scripts/versioning.sh VE test)
+      TAG=$(/automations/runner/versioning.sh VE test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
