@@ -52,16 +52,16 @@
   script:
     - |
       apk add --no-cache git bash
-      git tag -l
       TAG=$(/automations/runner/versioning.sh IK test)
-      echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
+      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
       git tag $TAG
       git push origin $TAG -o ci.skip
   artifacts:
     paths:
-      - /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
+      - /automations/runner/${BRANCH}-IKEA-TAG.txt
   rules:
     - if:
       changes:
@@ -85,14 +85,15 @@
     - |
       apk add --no-cache git bash
       TAG=$(/automations/runner/versioning.sh VE test)
-      echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
+      echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
       git tag $TAG
       git push origin $TAG -o ci.skip
   artifacts:
     paths:
-      - /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
+      - /automations/runner/${BRANCH}-VERILA-TAG.txt
   rules:
     - if:
       changes:
