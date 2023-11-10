@@ -54,8 +54,7 @@
       docker-compose --version
       ls -l /automations/runner/
       chmod +x /automations/runner/versioning.sh
-      /automations/runner/versioning.sh IK test
-      TAG=$(/automations/runner/versioning.sh IK test)
+      TAG=$(/bin/sh /automations/runner/versioning.sh IK test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
