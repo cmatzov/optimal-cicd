@@ -54,8 +54,8 @@
   script:
     - |
       apk add --no-cache curl
-      docker-compose --version
       curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      docker-compose --version
       TAG=$(scripts/versioning.sh IK test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
