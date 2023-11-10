@@ -53,7 +53,7 @@
     - |
       apk add --no-cache git bash
       git tag -l
-      TAG=$(/bin/sh /automations/runner/versioning.sh IK test)
+      TAG=$(/automations/runner/versioning.sh IK test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-IKEA-TAG.txt
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
@@ -84,7 +84,7 @@
   script:
     - |
       apk add --no-cache git bash
-      TAG=$(/bin/sh /automations/runner/versioning.sh VE test)
+      TAG=$(/automations/runner/versioning.sh VE test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
