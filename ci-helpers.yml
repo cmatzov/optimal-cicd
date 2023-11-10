@@ -87,6 +87,8 @@
     - |
       apk add --no-cache curl
       curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      docker-compose --version      
+      docker-compose --version
       TAG=$(scripts/versioning.sh VE test)
       echo $TAG > /automations/runner/${CI_COMMIT_BRANCH}-VERILA-TAG.txt
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
