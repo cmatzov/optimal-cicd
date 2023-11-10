@@ -5,7 +5,9 @@ ENV=$2
 
 LAST_TAG=$(git tag -l "*-$PROJECT" | sort -V | tail -1)
 
-IFS='-.' read -r -a tag_components <<< "$LAST_TAG"
+IFS='-.' read -r -a tag_components << EOF
+$LAST_TAG
+EOF
 
 MAJOR=${tag_components[0]}
 MINOR=${tag_components[1]}
