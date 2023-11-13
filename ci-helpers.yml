@@ -27,7 +27,7 @@
     - dotnet tool restore
     - dotnet build
     - dotnet roslynator analyze | grep "^0 diagnostics found$"
-    # - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
+    - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
 
 .anal_frontend:
   rules:
