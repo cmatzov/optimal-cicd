@@ -50,7 +50,7 @@
   tags: 
     - optimal-novus-runner
   before_script:
-    - docker login $REGISTRY_URI $REGISTRY_USER $REGISTRY_PASSWD
+    - docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
   script:
     - |
       apk update
@@ -86,7 +86,7 @@
   tags: 
     - optimal-novus-runner
   before_script:
-    - docker login $REGISTRY_URI $REGISTRY_USER $REGISTRY_PASSWD
+    - docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
   script:
     - |
       apk update
