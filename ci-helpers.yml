@@ -1,5 +1,3 @@
-glpat-6MNRFK6yxK29-JtjtfUN
-
 before_script:
   - |
     apk update
