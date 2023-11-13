@@ -3,7 +3,6 @@ before_script:
     apk update
     apk add --no-cache git bash findutils
     docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
-    git remote set-url origin https://${GIT_PASSWD}@gitlab.optim-al.com/optimal-projects/optimal/optimal-novus.git
 
 .scheduled-clear:
   rules: 
@@ -64,8 +63,7 @@ before_script:
       devops/pipelines/build/docker-tmp.sh
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
-      git tag $TAG
-      git push origin $TAG -o ci.skip
+      curl -X POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}"
   artifacts:
     paths:
       - /automations/runner/${BRANCH}-IKEA-TAG.txt
@@ -96,8 +94,7 @@ before_script:
       devops/pipelines/build/docker-tmp.sh
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
-      git tag $TAG
-      git push origin $TAG -o ci.skip
+      curl -X POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}"
   artifacts:
     paths:
       - /automations/runner/${BRANCH}-VERILA-TAG.txt
