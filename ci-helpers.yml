@@ -1,7 +1,7 @@
 before_script:
   - |
     apk update
-    apk add --no-cache git bash findutils
+    apk add --no-cache git bash findutils curl
     docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
 
 .scheduled-clear:
