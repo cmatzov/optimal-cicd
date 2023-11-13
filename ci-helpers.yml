@@ -3,7 +3,7 @@ before_script:
     apk update
     apk add --no-cache git bash findutils
     docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
-    echo "https://$GIT_USER:$GIT_PASSWD@gitlab.optim-al.com" > ~/.git-credentials
+    git remote set-url origin https://oauth2:$GIT_PASSWD@gitlab.optim-al.com
 
 .scheduled-clear:
   rules: 
