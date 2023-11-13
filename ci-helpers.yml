@@ -4,6 +4,9 @@ before_script:
     apk add --no-cache git bash findutils
     docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
     echo "https://$GIT_USER:$GIT_PASSWD@gitlab.optim-al.com" > ~/.git-credentials
+    ls -la ~/.git/
+    cat ~/.git/config
+    exit 1
 
 .scheduled-clear:
   rules: 
