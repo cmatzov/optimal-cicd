@@ -49,6 +49,8 @@
 .docker_ikea:
   tags: 
     - optimal-novus-runner
+  before_script:
+    - docker login $REGISTRY_URI $REGISTRY_USER $REGISTRY_PASSWD
   script:
     - |
       apk update
@@ -83,6 +85,8 @@
 .docker_verila:
   tags: 
     - optimal-novus-runner
+  before_script:
+    - docker login $REGISTRY_URI $REGISTRY_USER $REGISTRY_PASSWD
   script:
     - |
       apk update
