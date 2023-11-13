@@ -63,7 +63,7 @@ before_script:
       devops/pipelines/build/docker-tmp.sh
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
-      curl -X POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}&ci_skip=true"
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}&ci_skip=true"
   artifacts:
     paths:
       - /automations/runner/${BRANCH}-IKEA-TAG.txt
@@ -94,10 +94,10 @@ before_script:
       devops/pipelines/build/docker-tmp.sh
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
-      curl -X POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}&ci_skip=true"
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}&ci_skip=true"
   artifacts:
     paths:
-      - /automations/runner/${BRANCH}-VERILA-TAG.txt
+    - /automations/runner/${BRANCH}-VERILA-TAG.txt
   rules:
     - if:
       changes:
