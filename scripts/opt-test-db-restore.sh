@@ -15,7 +15,7 @@ sudo cp \$verila_backup /automations/backups/
 
 for container in \$containers; do
     lxc start \$container
-    sleep 5
+    sleep 30
 
     lxc exec \$container -- /bin/bash << EOL
     docker exec -i optimal-novus_postgresql_1 pg_restore -h localhost -U postgres -d ikea < /root/ikea*.tar
