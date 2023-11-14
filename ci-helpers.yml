@@ -79,6 +79,7 @@ before_script:
         - js/packages/web/package.json
         - js/packages/web/src/ikea/**/*
         - js/packages/web/src/shared/**/*
+      when: manual
 
 .docker_verila:
   tags: 
@@ -107,4 +108,5 @@ before_script:
         - js/packages/web/package.json
         - js/packages/web/src/verila/**/*
         - js/packages/web/src/shared/**/*
+      when: manual
 #
