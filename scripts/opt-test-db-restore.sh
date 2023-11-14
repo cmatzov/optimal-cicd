@@ -19,7 +19,7 @@ for container in $containers; do
 
     lxc exec $container -- bash -c '
     docker exec -i optimal-novus_postgresql_1 pg_restore -h localhost -U postgres -d ikea < /root/ikea*.tar
-    docker exec -i optimal-novus_postgresql_1 pg_restore -h localhost -U postgres -d verila < /root/verila*.tar
+    # docker exec -i optimal-novus_postgresql_1 pg_restore -h localhost -U postgres -d verila < /root/verila*.tar
     '
 
     lxc stop $container
