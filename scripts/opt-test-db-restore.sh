@@ -25,9 +25,9 @@ EOL
 
     lxc stop \$container
 
-    lxc delete \$container_name/base-snap-test
+    lxc delete \$container/base-snap-test
 
-    lxc snapshot \$container_name base-snap-test
+    lxc snapshot \$container base-snap-test
 
 done
 EOF
