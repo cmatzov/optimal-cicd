@@ -11,12 +11,9 @@ MAJOR=${tag_components[0]}
 MINOR=${tag_components[1]}
 PATCH=${tag_components[2]}
 
-if [ "$ENV" == "test" ]; then
+if [ "$ENV" == "dev" ]; then
     PATCH=$((PATCH + 1))
     NEW_TAG="$MAJOR.$MINOR.$PATCH-rc-$PROJECT"
-    echo $NEW_TAG
-elif [ "$ENV" == "dev" ]; then
-    NEW_TAG="$MAJOR.$MINOR.$PATCH-$PROJECT"
     echo $NEW_TAG
 elif [ "$ENV" == "prod" ]; then
     if [ "$MINOR" -eq 9 ]; then

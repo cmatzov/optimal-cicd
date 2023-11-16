@@ -12,19 +12,22 @@ before_script:
   script:
     - /automations/runner/clear-sched.sh
 
-.db_restore:
+.db-restore:
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $RESTORE_SCRIPT == "yes"'
   tags: 
     - optimal-novus-runner
   script:
     - /automations/runner/opt-test-db-restore.sh
+# Fix backups
 
-.anal_backend:
+.anal-backend:
   rules:
     - if:
       changes:
         - net/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
   tags:
     - optimal-novus-runner
   image: mcr.microsoft.com/dotnet/sdk:6.0
@@ -35,11 +38,13 @@ before_script:
     - dotnet roslynator analyze | grep "^0 diagnostics found$"
     - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
 
-.anal_frontend:
+.anal-frontend:
   rules:
     - if:
       changes:
         - js/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
   tags:
     - optimal-novus-runner
   image: node:16
@@ -52,20 +57,19 @@ before_script:
     - cd ../..
     - npm run lint
 
-.docker_ikea:
+.docker-ikea:
   tags: 
     - optimal-novus-runner
   script:
     - |
-      TAG=$(/automations/runner/versioning.sh IK test)
+      TAG=$CI_PIPELINE_ID
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if:
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master"'
       changes:
         - net/ikea/**/*
         - net/shared/**/*
@@ -80,21 +84,22 @@ before_script:
         - js/packages/web/src/ikea/**/*
         - js/packages/web/src/shared/**/*
       when: manual
+    - if: $CI_COMMIT_TAG
+      when: never
 
-.docker_verila:
+.docker-verila:
   tags: 
     - optimal-novus-runner
   script:
     - |
-      TAG=$(/automations/runner/versioning.sh VE test)
+      TAG=$CI_PIPELINE_ID
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if:
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master"'
       changes:
         - net/verila/**/*
         - net/shared/**/*
@@ -109,21 +114,22 @@ before_script:
         - js/packages/web/src/verila/**/*
         - js/packages/web/src/shared/**/*
       when: manual
+    - if: $CI_COMMIT_TAG
+      when: never
 
-.docker_ikea_dev:
+.docker-ikea-dev:
   tags: 
     - optimal-novus-runner
   script:
     - |
       TAG=$(/automations/runner/versioning.sh IK dev)
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
+      echo $TAG > /automations/runner/develop-IKEA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if: "$CI_PIPELINE_SOURCE" == "merge_request_event"
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "develop"'
       changes:
         - net/ikea/**/*
         - net/shared/**/*
@@ -138,20 +144,73 @@ before_script:
         - js/packages/web/src/ikea/**/*
         - js/packages/web/src/shared/**/*
 
-.docker_verila_dev:
+.docker-verila-dev:
   tags: 
     - optimal-novus-runner
   script:
     - |
       TAG=$(/automations/runner/versioning.sh VE dev)
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
+      echo $TAG > /automations/runner/develop-VERILA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if:
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "develop"'
+      changes:
+        - net/verila/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/verila/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/verila-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/verila/**/*
+        - js/packages/web/src/shared/**/*
+
+.docker-ikea-prod:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      TAG=$(/automations/runner/versioning.sh IK prod)
+      echo $TAG > /automations/runner/develop-IKEA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=ikea TAG=$TAG ENV=Production docker-compose build
+      PROJECT=ikea TAG=$TAG ENV=Production docker-compose push
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+      changes:
+        - net/ikea/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/ikea/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/ikea-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/ikea/**/*
+        - js/packages/web/src/shared/**/*
+
+.docker-verila-prod:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      TAG=$(/automations/runner/versioning.sh VE prod)
+      echo $TAG > /automations/runner/develop-VERILA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=verila TAG=$TAG ENV=Production docker-compose build
+      PROJECT=verila TAG=$TAG ENV=Production docker-compose push
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
       changes:
         - net/verila/**/*
         - net/shared/**/*
