@@ -122,8 +122,9 @@ before_script:
     - optimal-novus-runner
   script:
     - |
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       TAG=$(/automations/runner/versioning.sh IK dev)
-      echo $TAG > /automations/runner/develop-IKEA-TAG.txt
+      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
@@ -151,8 +152,9 @@ before_script:
     - optimal-novus-runner
   script:
     - |
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       TAG=$(/automations/runner/versioning.sh VE dev)
-      echo $TAG > /automations/runner/develop-VERILA-TAG.txt
+      echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
