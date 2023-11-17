@@ -143,6 +143,8 @@ before_script:
         - js/packages/web/package.json
         - js/packages/web/src/ikea/**/*
         - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
 
 .docker-verila-dev:
   tags: 
@@ -170,6 +172,8 @@ before_script:
         - js/packages/web/package.json
         - js/packages/web/src/verila/**/*
         - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
 
 .docker-ikea-prod:
   tags: 
@@ -197,6 +201,8 @@ before_script:
         - js/packages/web/package.json
         - js/packages/web/src/ikea/**/*
         - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
 
 .docker-verila-prod:
   tags: 
@@ -224,3 +230,5 @@ before_script:
         - js/packages/web/package.json
         - js/packages/web/src/verila/**/*
         - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
