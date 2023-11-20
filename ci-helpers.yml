@@ -1,0 +1,236 @@
+before_script:
+  - |
+    apk update
+    apk add --no-cache git bash findutils curl
+    docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
+
+.scheduled-clear:
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CLEAR_ENV == "yes"'
+  tags: 
+    - optimal-novus-runner
+  script:
+    - /automations/runner/clear-sched.sh
+
+.db-restore:
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $RESTORE_SCRIPT == "yes"'
+  tags: 
+    - optimal-novus-runner
+  script:
+    - /automations/runner/opt-test-db-restore.sh
+# Fix backups
+
+.analyze-backend:
+  rules:
+    - if:
+      changes:
+        - net/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
+  tags:
+    - optimal-novus-runner
+  image: mcr.microsoft.com/dotnet/sdk:6.0
+  script:
+    - cd ./net
+    - dotnet tool restore
+    - dotnet build
+    - dotnet roslynator analyze | grep "^0 diagnostics found$"
+    - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
+
+.analyze-frontend:
+  rules:
+    - if:
+      changes:
+        - js/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
+  tags:
+    - optimal-novus-runner
+  image: node:16
+  script:
+    - cd js
+    - npm install
+    - npm install -g expo-cli
+    - cd apps/mobile
+    - npm run install:mobile
+    - cd ../..
+    - npm run lint
+
+.docker-ikea:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      TAG=$CI_PIPELINE_ID
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
+      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=ikea TAG=$TAG ENV=test docker-compose build
+      PROJECT=ikea TAG=$TAG ENV=test docker-compose push
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master"'
+      changes:
+        - net/ikea/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/ikea/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/ikea-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/ikea/**/*
+        - js/packages/web/src/shared/**/*
+      when: manual
+    - if: $CI_COMMIT_TAG
+      when: never
+
+.docker-verila:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      TAG=$CI_PIPELINE_ID
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
+      echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=verila TAG=$TAG ENV=test docker-compose build
+      PROJECT=verila TAG=$TAG ENV=test docker-compose push
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master"'
+      changes:
+        - net/verila/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/verila/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/verila-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/verila/**/*
+        - js/packages/web/src/shared/**/*
+      when: manual
+    - if: $CI_COMMIT_TAG
+      when: never
+
+.docker-ikea-dev:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
+      TAG=$(/automations/runner/versioning.sh IK dev)
+      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=ikea TAG=$TAG ENV=test docker-compose build
+      PROJECT=ikea TAG=$TAG ENV=test docker-compose push
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop"'
+      changes:
+        - net/ikea/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/ikea/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/ikea-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/ikea/**/*
+        - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
+
+.docker-verila-dev:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
+      TAG=$(/automations/runner/versioning.sh VE dev)
+      echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=verila TAG=$TAG ENV=test docker-compose build
+      PROJECT=verila TAG=$TAG ENV=test docker-compose push
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop"'
+      changes:
+        - net/verila/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/verila/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/verila-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/verila/**/*
+        - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
+
+.docker-ikea-prod:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      TAG=$(/automations/runner/versioning.sh IK prod)
+      echo $TAG > /automations/runner/develop-IKEA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=ikea TAG=$TAG ENV=Production docker-compose build
+      PROJECT=ikea TAG=$TAG ENV=Production docker-compose push
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+      changes:
+        - net/ikea/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/ikea/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/ikea-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/ikea/**/*
+        - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
+
+.docker-verila-prod:
+  tags: 
+    - optimal-novus-runner
+  script:
+    - |
+      TAG=$(/automations/runner/versioning.sh VE prod)
+      echo $TAG > /automations/runner/develop-VERILA-TAG.txt
+      devops/pipelines/build/docker-tmp.sh
+      PROJECT=verila TAG=$TAG ENV=Production docker-compose build
+      PROJECT=verila TAG=$TAG ENV=Production docker-compose push
+      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+      changes:
+        - net/verila/**/*
+        - net/shared/**/*
+        - js/package.json
+        - js/apps/mobile/package.json
+        - js/apps/mobile/src/verila/**/*
+        - js/apps/mobile/src/shared/**/*
+        - js/packages/common/package.json
+        - js/packages/common/src/verila-api/**/*
+        - js/packages/common/src/shared/**/*
+        - js/packages/web/package.json
+        - js/packages/web/src/verila/**/*
+        - js/packages/web/src/shared/**/*
+    - if: $CI_COMMIT_TAG
+      when: never
