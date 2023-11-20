@@ -21,7 +21,7 @@ before_script:
     - /automations/runner/opt-test-db-restore.sh
 # Fix backups
 
-.anal-backend:
+.analyze-backend:
   rules:
     - if:
       changes:
@@ -38,7 +38,7 @@ before_script:
     - dotnet roslynator analyze | grep "^0 diagnostics found$"
     - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
 
-.anal-frontend:
+.analyze-frontend:
   rules:
     - if:
       changes:
