@@ -26,7 +26,7 @@ before_script:
         - net/**/*
     - if: $CI_COMMIT_TAG
       when: never
-    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
   tags:
     - optimal-novus-runner
@@ -45,7 +45,7 @@ before_script:
         - js/**/*
     - if: $CI_COMMIT_TAG
       when: never
-    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
   tags:
     - optimal-novus-runner
