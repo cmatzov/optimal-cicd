@@ -28,6 +28,8 @@ before_script:
         - net/**/*
     - if: $CI_COMMIT_TAG
       when: never
+    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+      when: never
   tags:
     - optimal-novus-runner
   image: mcr.microsoft.com/dotnet/sdk:6.0
@@ -44,6 +46,8 @@ before_script:
       changes:
         - js/**/*
     - if: $CI_COMMIT_TAG
+      when: never
+    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
       when: never
   tags:
     - optimal-novus-runner
