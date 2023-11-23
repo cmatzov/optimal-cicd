@@ -1,6 +1,6 @@
-before_script:
-  - |
-    docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
+# before_script:
+#   - |
+#     docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
 
 .scheduled-clear:
   rules: 
