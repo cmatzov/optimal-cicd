@@ -16,12 +16,10 @@
 
 .analyze-backend:
   rules:
-    - if:
+    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
       changes:
         - net/**/*
     - if: $CI_COMMIT_TAG
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
   tags:
     - optimal-novus-runner
@@ -35,12 +33,10 @@
 
 .analyze-frontend:
   rules:
-    - if:
+    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
       changes:
         - js/**/*
     - if: $CI_COMMIT_TAG
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
   tags:
     - optimal-novus-runner
