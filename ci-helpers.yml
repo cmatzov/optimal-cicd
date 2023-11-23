@@ -62,7 +62,7 @@
       PROJECT=ikea TAG=$TAG ENV=test docker-compose build
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
   rules:
-    - if: '$CI_COMMIT_BRANCH != "test-ci-develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
       changes:
         - net/ikea/**/*
         - net/shared/**/*
@@ -92,7 +92,7 @@
       PROJECT=verila TAG=$TAG ENV=test docker-compose build
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
   rules:
-    - if: '$CI_COMMIT_BRANCH != "test-ci-develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event"'
       changes:
         - net/verila/**/*
         - net/shared/**/*
@@ -123,7 +123,7 @@
       PROJECT=ikea TAG=$TAG ENV=test docker-compose push
       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "test-ci-develop"'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop"'
       changes:
         - net/ikea/**/*
         - net/shared/**/*
@@ -153,7 +153,7 @@
       PROJECT=verila TAG=$TAG ENV=test docker-compose push
       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "test-ci-develop"'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop"'
       changes:
         - net/verila/**/*
         - net/shared/**/*
