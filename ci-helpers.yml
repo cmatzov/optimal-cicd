@@ -1,7 +1,3 @@
-# before_script:
-#   - |
-#     docker login $REGISTRY_URI -u $REGISTRY_USER -p $REGISTRY_PASSWD
-
 .scheduled-clear:
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CLEAR_ENV == "yes"'
@@ -17,7 +13,6 @@
     - optimal-novus-runner
   script:
     - /automations/runner/opt-test-db-restore.sh
-# Fix backups
 
 .analyze-backend:
   rules:
