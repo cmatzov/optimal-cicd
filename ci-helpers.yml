@@ -44,12 +44,12 @@
   script:
     - cd js
     - npm install
-    - npm install -g expo-cli
+    - npm install -g expo-cli@4.10.0
     - cd apps/mobile
     - npm run install:mobile
     - cd ../..
     - npm run lint
-
+    
 .docker-ikea:
   tags: 
     - optimal-novus-runner
