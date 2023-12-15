@@ -59,8 +59,8 @@
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
-      PROJECT=ikea TAG=$TAG ENV=test docker-compose build
-      PROJECT=ikea TAG=$TAG ENV=test docker-compose push
+      PROJECT=ikea TAG=$TAG ENV=Test docker-compose build
+      PROJECT=ikea TAG=$TAG ENV=Test docker-compose push
   rules:
     - if: '$CI_COMMIT_BRANCH != "deployment" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       changes:
@@ -89,8 +89,8 @@
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
-      PROJECT=verila TAG=$TAG ENV=test docker-compose build
-      PROJECT=verila TAG=$TAG ENV=test docker-compose push
+      PROJECT=verila TAG=$TAG ENV=Test docker-compose build
+      PROJECT=verila TAG=$TAG ENV=Test docker-compose push
   rules:
     - if: '$CI_COMMIT_BRANCH != "deployment" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       changes:
@@ -119,8 +119,8 @@
       TAG=$(/automations/runner/versioning.sh IK dev)
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
-      PROJECT=ikea TAG=$TAG ENV=test docker-compose build
-      PROJECT=ikea TAG=$TAG ENV=test docker-compose push
+      PROJECT=ikea TAG=$TAG ENV=Test docker-compose build
+      PROJECT=ikea TAG=$TAG ENV=Test docker-compose push
       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "deployment"'
@@ -149,8 +149,8 @@
       TAG=$(/automations/runner/versioning.sh VE dev)
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       devops/pipelines/build/docker-tmp.sh
-      PROJECT=verila TAG=$TAG ENV=test docker-compose build
-      PROJECT=verila TAG=$TAG ENV=test docker-compose push
+      PROJECT=verila TAG=$TAG ENV=Test docker-compose build
+      PROJECT=verila TAG=$TAG ENV=Test docker-compose push
       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "deployment"'
