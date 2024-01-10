@@ -179,9 +179,9 @@
     - |
         export TAG="stage-0.0.10"
         docker-compose --env-file /automations/runner/.env config
-      # devops/pipelines/build/docker-tmp.sh
-      # docker-compose --env-file /automations/runner/.env build
-      # docker-compose --env-file /automations/runner/.env push
+      devops/pipelines/build/docker-tmp.sh
+      docker-compose --env-file /automations/runner/.env build
+      docker-compose --env-file /automations/runner/.env push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "ci-stage-testing"'
       changes:
