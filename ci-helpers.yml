@@ -177,7 +177,7 @@
     name: stage
   script:
     - |
-        TAG=stage-0.0.10
+        echo "TAG=stage-0.0.10" >> /automations/runner/.env
         docker-compose --env-file /automations/runner/.env config
       # devops/pipelines/build/docker-tmp.sh
       # docker-compose --env-file /automations/runner/.env build
