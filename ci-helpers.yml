@@ -53,6 +53,8 @@
 .docker-ikea:
   tags: 
     - optimal-novus-runner
+  environment:
+    name: test
   script:
     - |
       TAG=$CI_PIPELINE_ID
@@ -83,6 +85,8 @@
 .docker-verila:
   tags: 
     - optimal-novus-runner
+  environment:
+    name: test
   script:
     - |
       TAG=$CI_PIPELINE_ID
@@ -113,6 +117,8 @@
 .docker-ikea-dev:
   tags: 
     - optimal-novus-runner
+  environment:
+    name: uat
   script:
     - |
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
@@ -143,6 +149,8 @@
 .docker-verila-dev:
   tags: 
     - optimal-novus-runner
+  environment:
+    name: uat
   script:
     - |
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
@@ -178,6 +186,7 @@
   script:
     - |
       export TAG="stage-0.0.10"
+      export PROJECT="ikea"
       docker-compose --env-file /automations/runner/.env config
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env build
@@ -208,6 +217,7 @@
   script:
     - |
       export TAG="stage-0.0.10"
+      export PROJECT="verila"
       docker-compose --env-file /automations/runner/.env config
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env build
