@@ -58,9 +58,10 @@
   script:
     - |
       TAG=$CI_PIPELINE_ID
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
+      export PROJECT="ikea"
       devops/pipelines/build/docker-tmp.sh
+      docker-compose --env-file /automations/runner/.env config
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
@@ -92,6 +93,7 @@
       TAG=$CI_PIPELINE_ID
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
+      export PROJECT="verila"
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
@@ -122,12 +124,12 @@
   script:
     - |
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      TAG=$(/automations/runner/versioning.sh IK dev)
+      TAG=$(git tag -l "*-IK" | sort -V | tail -1)
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
+      export PROJECT="ikea"
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "deployment"'
       changes:
@@ -154,12 +156,12 @@
   script:
     - |
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      TAG=$(/automations/runner/versioning.sh VE dev)
+      TAG=$(git tag -l "*-VE" | sort -V | tail -1)
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
+      export PROJECT="verila"
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "deployment"'
       changes:
@@ -185,12 +187,14 @@
     name: stage
   script:
     - |
-      export TAG="stage-0.0.10"
+      TAG=$(/automations/runner/versioning.sh VE dev)
+      export TAG=$TAG
       export PROJECT="ikea"
       docker-compose --env-file /automations/runner/.env config
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
+    # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "ci-stage-testing"'
       changes:
@@ -216,12 +220,13 @@
     name: stage
   script:
     - |
-      export TAG="stage-0.0.10"
+      TAG=$(/automations/runner/versioning.sh VE dev)
       export PROJECT="verila"
       docker-compose --env-file /automations/runner/.env config
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
+    # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "ci-stage-testing"'
       changes:
