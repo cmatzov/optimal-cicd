@@ -101,7 +101,7 @@
       docker-compose --env-file /automations/runner/.env push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "deployment"'
-      wwhen: manual
+      when: manual
     - if: $CI_COMMIT_TAG
       when: never
 
