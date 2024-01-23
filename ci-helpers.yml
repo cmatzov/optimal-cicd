@@ -60,6 +60,7 @@
       TAG=$CI_PIPELINE_ID
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
+      export TAG=${TAG}
       export PROJECT="ikea"
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env config
