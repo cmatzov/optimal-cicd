@@ -67,7 +67,7 @@
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
-    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "web"'
       changes:
         - net/ikea/**/*
         - net/shared/**/*
@@ -207,7 +207,7 @@
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
-    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "web"'
       changes:
         - net/verila/**/*
         - net/shared/**/*
