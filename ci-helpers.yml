@@ -155,7 +155,7 @@
 
 .scheduled-docker-ikea-stage:
   rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_IKEA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_IKEA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
   tags: 
     - optimal-novus-runner
   environment:
@@ -174,7 +174,7 @@
 
 .scheduled-docker-ikea-prod:
   rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_IKEA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_IKEA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
   tags: 
     - optimal-novus-runner
   environment:
@@ -294,7 +294,7 @@
 
 .scheduled-docker-verila-stage:
   rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_VERILA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_VERILA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
   tags: 
     - optimal-novus-runner
   environment:
@@ -313,7 +313,7 @@
 
 .scheduled-docker-verila-prod:
   rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_VERILA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_VERILA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
   tags: 
     - optimal-novus-runner
   environment:
