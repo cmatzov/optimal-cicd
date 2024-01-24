@@ -59,8 +59,8 @@
     - |
       VERSION=$CI_PIPELINE_ID
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      echo $VERSION > /automations/runner/${BRANCH}-IKEA-TAG.txt
-      export TAG=${VERSION}
+      export TAG=$VERSION
+      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       export PROJECT="ikea"
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env config
@@ -93,7 +93,8 @@
   script:
     - |
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      TAG=$CI_PIPELINE_ID
+      VERSION=$CI_PIPELINE_ID
+      export TAG=$VERSION
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       export PROJECT="ikea"
       devops/pipelines/build/docker-tmp.sh
@@ -199,7 +200,8 @@
     name: test
   script:
     - |
-      TAG=$CI_PIPELINE_ID
+      VERSION=$CI_PIPELINE_ID
+      export TAG=$VERSION
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       export PROJECT="verila"
@@ -233,7 +235,8 @@
   script:
     - |
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      TAG=$CI_PIPELINE_ID
+      VERSION=$CI_PIPELINE_ID
+      export TAG=$VERSION
       echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
       export PROJECT="verila"
       devops/pipelines/build/docker-tmp.sh
