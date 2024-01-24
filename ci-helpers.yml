@@ -67,7 +67,7 @@
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
-    - if: '$CI_COMMIT_BRANCH != "ci-stage-testing" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       changes:
         - net/ikea/**/*
         - net/shared/**/*
@@ -101,7 +101,7 @@
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "deployment"'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "master" '
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
@@ -123,7 +123,7 @@
       docker-compose --env-file /automations/runner/.env push
     # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "ci-stage-testing"'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop"'
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
@@ -207,7 +207,7 @@
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
-    - if: '$CI_COMMIT_BRANCH != "ci-stage-testing" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       changes:
         - net/verila/**/*
         - net/shared/**/*
@@ -262,7 +262,7 @@
       docker-compose --env-file /automations/runner/.env push
     # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "ci-stage-testing"'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop"'
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
