@@ -113,7 +113,7 @@
     name: stage
   script:
     - |
-      VERSION=$(/automations/runner/versioning.sh IK dev)
+      VERSION=$(/automations/runner/versioning.sh IK Staging)
       export TAG=$VERSION
       echo $TAG > /automations/runner/STAGE-IKEA-TAG.txt
       export PROJECT="ikea"
@@ -152,6 +152,45 @@
       when: never
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $CI_ENVIRONMENT == "Production"'
       when: manual
+
+.scheduled-docker-ikea-stage:
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_IKEA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+  tags: 
+    - optimal-novus-runner
+  environment:
+    name: stage
+  script:
+    - |
+      VERSION=$(/automations/runner/versioning.sh IK Staging)
+      export TAG=$VERSION
+      echo $TAG > /automations/runner/STAGE-IKEA-TAG.txt
+      export PROJECT="ikea"
+      devops/pipelines/build/docker-tmp.sh
+      docker-compose --env-file /automations/runner/.env config
+      docker-compose --env-file /automations/runner/.env build
+      docker-compose --env-file /automations/runner/.env push
+    # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+
+.scheduled-docker-ikea-prod:
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_IKEA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+  tags: 
+    - optimal-novus-runner
+  environment:
+    name: production
+  script:
+    - |
+      VERSION=$(/automations/runner/versioning.sh IK prod)
+      export TAG=$VERSION
+      echo $TAG > /automations/runner/develop-IKEA-TAG.txt
+      export PROJECT="ikea"
+      export KC_HOSTNAME_URL="ikea.optim-al.com"
+      devops/pipelines/build/docker-tmp.sh
+      docker-compose --env-file /automations/runner/.env config
+      docker-compose --env-file /automations/runner/.env build
+      docker-compose --env-file /automations/runner/.env push
+    # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
 
 .docker-verila:
   tags: 
@@ -213,7 +252,7 @@
     name: stage
   script:
     - |
-      VERSION=$(/automations/runner/versioning.sh VE dev)
+      VERSION=$(/automations/runner/versioning.sh VE Staging)
       export TAG=$VERSION
       echo $TAG > /automations/runner/STAGE-VERILA-TAG.txt
       export PROJECT="verila"
@@ -231,6 +270,8 @@
 .docker-verila-prod:
   tags: 
     - optimal-novus-runner
+  environment:
+    name: production
   script:
     - |
       VERSION=$(/automations/runner/versioning.sh VE prod)
@@ -250,3 +291,42 @@
       when: never
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $CI_ENVIRONMENT == "Production"'
       when: manual
+
+.scheduled-docker-verila-stage:
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_VERILA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+  tags: 
+    - optimal-novus-runner
+  environment:
+    name: stage
+  script:
+    - |
+      VERSION=$(/automations/runner/versioning.sh VE Staging)
+      export TAG=$VERSION
+      echo $TAG > /automations/runner/STAGE-VERILA-TAG.txt
+      export PROJECT="verila"
+      devops/pipelines/build/docker-tmp.sh
+      docker-compose --env-file /automations/runner/.env config
+      docker-compose --env-file /automations/runner/.env build
+      docker-compose --env-file /automations/runner/.env push
+    # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+
+.scheduled-docker-verila-prod:
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_VERILA == "yes" && $GITLAB_USER_LOGIN in ($AUTHORIZED_USERS)'
+  tags: 
+    - optimal-novus-runner
+  environment:
+    name: production
+  script:
+    - |
+      VERSION=$(/automations/runner/versioning.sh VE prod)
+      export TAG=$VERSION
+      echo $TAG > /automations/runner/master-VERILA-TAG.txt
+      export PROJECT="verila"
+      export KC_HOSTNAME_URL="cus.verila-bg.com"
+      devops/pipelines/build/docker-tmp.sh
+      docker-compose --env-file /automations/runner/.env config
+      docker-compose --env-file /automations/runner/.env build
+      docker-compose --env-file /automations/runner/.env push
+    # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
