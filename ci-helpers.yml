@@ -12,7 +12,7 @@
   tags: 
     - optimal-novus-runner
   script:
-    - /automations/runner/opt-test-db-restore.sh
+    - /automations/runner/opt-local-db-restore.sh
 
 .analyze-backend:
   rules:
