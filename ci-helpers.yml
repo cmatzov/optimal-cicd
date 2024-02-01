@@ -1,18 +1,18 @@
-.scheduled-clear:
-  rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CLEAR_ENV == "yes"'
-  tags: 
-    - optimal-novus-runner
-  script:
-    - /automations/runner/clear-sched.sh
+# .scheduled-clear:
+#   rules: 
+#     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CLEAR_ENV == "yes"'
+#   tags: 
+#     - optimal-novus-runner
+#   script:
+#     - /automations/runner/clear-sched.sh
 
-.db-restore:
+.clear-test-and-db-restore:
   rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $RESTORE_SCRIPT == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_CLEAR == "yes"'
   tags: 
     - optimal-novus-runner
   script:
-    - /automations/runner/opt-local-db-restore.sh
+    - /automations/runner/clear-test-and-db-restore.sh
 
 .analyze-backend:
   rules:

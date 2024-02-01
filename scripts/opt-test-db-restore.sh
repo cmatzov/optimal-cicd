@@ -45,10 +45,11 @@ ssh -i /root/.ssh/id_rsa optimal@192.168.66.11 "bash -s" << 'EOF'
 
 clear_test_env_scheduled () {
   local containers=$(lxc list --format csv --columns=n | grep opt-tst)
-  local status=$(lxc info $container | grep "Status" | awk '{print $2}')
   
   for container in $containers; do
 
+    local status=$(lxc info $container | grep "Status" | awk '{print $2}')
+    
     if [ "$status" == "RUNNING" ]; then
     
         lxc stop $container
@@ -77,7 +78,7 @@ wait_for_the_daemon_to_start () {
 
   while true; do
   if lxc info $container | grep docker0; then
-    echo "Ready to deploy, just a minute..."
+    echo "Ready to restore the database, just a minute..."
     break
   else
     echo "Waiting for the container to start. Retrying in 5 seconds..."
