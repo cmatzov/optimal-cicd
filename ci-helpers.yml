@@ -383,7 +383,7 @@
       when: never
 
 .docker-build-biovet:
-  tags: optimal-novus-runner
+  tags: optimal-veteris-runner
   script:
     - |
       VERSION=$(/automations/runner/biovet-tag.sh)
