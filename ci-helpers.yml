@@ -1,11 +1,3 @@
-# .scheduled-clear:
-#   rules: 
-#     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CLEAR_ENV == "yes"'
-#   tags: 
-#     - optimal-novus-runner
-#   script:
-#     - /automations/runner/clear-sched.sh
-
 .clear-test-and-db-restore:
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_CLEAR == "yes"'
@@ -389,3 +381,15 @@
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
+
+.docker-build-biovet:
+  tags: optimal-novus-runner
+  script:
+    - |
+      VERSION=$(/automations/runner/biovet-tag.sh)
+      export TAG=$VERSION
+      export ENVIRONMENT="test"
+      TAG=$TAG ENVIRONMENT=$ENVIRONMENT docker-compose build
+      TAG=$TAG ENVIRONMENT=$ENVIRONMENT docker-compose push
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
