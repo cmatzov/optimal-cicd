@@ -388,12 +388,8 @@
   script:
     - |
       VERSION=$(/automations/runner/biovet-tag.sh)
-      export TAG=$VERSION
-      echo "TAG=$TAG" >> biovet-tag.env
+      export TAG=$CI_PIPELINE_ID
       TAG=$TAG ENVIRONMENT=test docker-compose build
       TAG=$TAG ENVIRONMENT=test docker-compose push
-  artifacts:
-    reports:
-      dotenv: biovet-tag.env
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
