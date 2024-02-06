@@ -389,9 +389,8 @@
       VERSION=$(/automations/runner/biovet-tag.sh)
       export TAG=$VERSION
       echo "TAG=$TAG" >> biovet-tag.env
-      export ENVIRONMENT="test"
-      TAG=$TAG ENVIRONMENT=$ENVIRONMENT docker-compose build
-      TAG=$TAG ENVIRONMENT=$ENVIRONMENT docker-compose push
+      TAG=$TAG ENVIRONMENT=test docker-compose build
+      TAG=$TAG ENVIRONMENT=test docker-compose push
   artifacts:
     reports:
       dotenv: biovet-tag.env
