@@ -388,7 +388,6 @@
   script:
     - |
       export TAG=$CI_PIPELINE_ID
-      git checkout infra/master-test-ci
       git fetch
       git merge origin/master
       git push
