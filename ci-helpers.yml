@@ -388,7 +388,8 @@
   script:
     - |
       export TAG=$CI_PIPELINE_ID
-      git pull
+      git checkout infra/master-test-ci
+      git fetch
       git merge origin/master
       git push
       TAG=$TAG ENVIRONMENT=test docker-compose build
