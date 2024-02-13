@@ -386,12 +386,10 @@
   tags: 
     - optimal-veteris-runner
   script:
-    - |
-      export TAG=$CI_PIPELINE_ID
-      git fetch
-      git merge origin/master
-      git push
-      TAG=$TAG ENVIRONMENT=test docker-compose build
-      TAG=$TAG ENVIRONMENT=test docker-compose push
+    - export TAG=$CI_PIPELINE_ID
+    - git fetch
+    - git merge origin/master
+    - TAG=$TAG ENVIRONMENT=test docker-compose build
+    - TAG=$TAG ENVIRONMENT=test docker-compose push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
