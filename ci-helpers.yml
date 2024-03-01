@@ -154,7 +154,7 @@
   environment:
     name: stage
   script:
-    - /automations/runner/tag.sh
+    - echo $(/automations/runner/tag.sh)
     - VERSION=$(/automations/runner/versioning.sh IK Staging)
     - export TAG=$VERSION
     - echo $TAG
