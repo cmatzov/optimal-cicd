@@ -156,6 +156,7 @@
   script:
     - VERSION=$(/automations/runner/versioning.sh IK Staging)
     - export TAG=$VERSION
+    - echo $TAG
     - echo $TAG > /automations/runner/STAGE-IKEA-TAG.txt
     - export PROJECT="ikea"
     - devops/pipelines/build/docker-tmp.sh
