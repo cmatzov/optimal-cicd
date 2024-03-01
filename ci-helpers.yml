@@ -154,7 +154,7 @@
   environment:
     name: stage
   script:
-    - LAST_TAG=$(git tag -l "*-IK" | sort -V | tail -1)
+    - git tag -l 
     - echo $LAST_TAG
     - VERSION=$(/automations/runner/versioning.sh IK Staging)
     - export TAG=$VERSION
