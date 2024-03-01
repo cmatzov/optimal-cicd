@@ -49,6 +49,7 @@
     name: test
   script:
     - |
+      git fetch --all
       VERSION=$CI_PIPELINE_ID
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       export TAG=$VERSION
@@ -84,6 +85,7 @@
     name: uat
   script:
     - |
+      git fetch --all
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       VERSION=$CI_PIPELINE_ID
       export TAG=$VERSION
@@ -105,11 +107,12 @@
   environment:
     name: stage
   script:
+    - git fetch --all
     - VERSION=$(/automations/runner/versioning.sh IK Staging)
     - export TAG=$VERSION
     - echo $TAG
     - echo $TAG > /automations/runner/STAGE-IKEA-TAG.txt
-    -  export PROJECT="ikea"
+    - export PROJECT="ikea"
     - devops/pipelines/build/docker-tmp.sh
     - docker-compose --env-file /automations/runner/.env config
     - docker-compose --env-file /automations/runner/.env build
@@ -128,6 +131,7 @@
     name: production
   script:
     - |
+      git fetch --all
       VERSION=$(/automations/runner/versioning.sh IK prod)
       export TAG=$VERSION
       echo $TAG > /automations/runner/develop-IKEA-TAG.txt
@@ -174,6 +178,7 @@
     name: production
   script:
     - |
+      git fetch --all
       VERSION=$(/automations/runner/versioning.sh IK prod)
       export TAG=$VERSION
       echo $TAG > /automations/runner/develop-IKEA-TAG.txt
@@ -192,6 +197,7 @@
     name: test
   script:
     - |
+      git fetch --all
       VERSION=$CI_PIPELINE_ID
       export TAG=$VERSION
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
@@ -226,6 +232,7 @@
     name: uat
   script:
     - |
+      git fetch --all
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       VERSION=$CI_PIPELINE_ID
       export TAG=$VERSION
@@ -247,6 +254,7 @@
     name: stage
   script:
     - |
+      git fetch --all
       VERSION=$(/automations/runner/versioning.sh VE Staging)
       export TAG=$VERSION
       echo $TAG > /automations/runner/STAGE-VERILA-TAG.txt
@@ -269,6 +277,7 @@
     name: production
   script:
     - |
+      git fetch --all
       VERSION=$(/automations/runner/versioning.sh VE prod)
       export TAG=$VERSION
       echo $TAG > /automations/runner/develop-VERILA-TAG.txt
@@ -296,6 +305,7 @@
     name: stage
   script:
     - |
+      git fetch --all
       VERSION=$(/automations/runner/versioning.sh VE Staging)
       export TAG=$VERSION
       echo $TAG > /automations/runner/STAGE-VERILA-TAG.txt
@@ -315,6 +325,7 @@
     name: production
   script:
     - |
+      git fetch --all
       VERSION=$(/automations/runner/versioning.sh VE prod)
       export TAG=$VERSION
       echo $TAG > /automations/runner/master-VERILA-TAG.txt
@@ -333,6 +344,7 @@
     name: test
   script:
     - |
+      git fetch --all
       VERSION=$CI_PIPELINE_ID
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       export TAG=$VERSION
@@ -368,6 +380,7 @@
     name: uat
   script:
     - |
+      git fetch --all
       BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
       VERSION=$CI_PIPELINE_ID
       export TAG=$VERSION
@@ -387,7 +400,7 @@
     - optimal-veteris-runner
   script:
     - export TAG=$CI_PIPELINE_ID
-    - git fetch
+    - git fetch --all
     - git merge origin/master
     - TAG=$TAG ENVIRONMENT=test docker-compose build
     - TAG=$TAG ENVIRONMENT=test docker-compose push
