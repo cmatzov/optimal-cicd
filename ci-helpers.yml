@@ -181,7 +181,7 @@
       git fetch --all
       VERSION=$(/automations/runner/versioning.sh IK Production)
       export TAG=$VERSION
-      echo $TAG > /automations/runner/develop-IKEA-TAG.txt
+      echo $TAG > /automations/runner/master-IKEA-TAG.txt
       export PROJECT="ikea"
       export KC_HOSTNAME_URL="ikea.optim-al.com"
       devops/pipelines/build/docker-tmp.sh
