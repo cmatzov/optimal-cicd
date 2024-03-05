@@ -132,7 +132,7 @@
   script:
     - |
       git fetch --all
-      VERSION=$(/automations/runner/versioning.sh IK prod)
+      VERSION=$(/automations/runner/versioning.sh IK Production)
       export TAG=$VERSION
       echo $TAG > /automations/runner/develop-IKEA-TAG.txt
       export PROJECT="ikea"
@@ -278,7 +278,7 @@
   script:
     - |
       git fetch --all
-      VERSION=$(/automations/runner/versioning.sh VE prod)
+      VERSION=$(/automations/runner/versioning.sh VE Production)
       export TAG=$VERSION
       echo $TAG > /automations/runner/develop-VERILA-TAG.txt
       export PROJECT="verila"
