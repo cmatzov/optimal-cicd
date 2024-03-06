@@ -92,8 +92,6 @@
       echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
       export PROJECT="ikea"
       devops/pipelines/build/docker-tmp.sh
-      echo $KC_EXTERNAL_URL
-      echo $KC_HOSTNAME_URL
       docker-compose --env-file /automations/runner/.env config
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
