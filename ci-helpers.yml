@@ -119,7 +119,7 @@
     - docker-compose --env-file /automations/runner/.env push
     # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $CI_ENVIRONMENT == "stage" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
@@ -147,7 +147,7 @@
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $CI_ENVIRONMENT == "production" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
 
 .scheduled-docker-ikea-stage:
@@ -265,7 +265,7 @@
       docker-compose --env-file /automations/runner/.env push
     # curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $CI_ENVIRONMENT == "stage" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
@@ -293,7 +293,7 @@
       when: manual
     - if: $CI_COMMIT_TAG
       when: never
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $CI_ENVIRONMENT == "production" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
 
 .scheduled-docker-verila-stage:
