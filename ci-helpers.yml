@@ -12,7 +12,7 @@
   environment:
     name: stage
   rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_CLEAR == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $BACKUPS == "yes"'
   script:
     - /automations/runner/ikea-daily-backups.sh
 
