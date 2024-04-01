@@ -6,6 +6,16 @@
   script:
     - /automations/runner/clear-test-and-db-restore.sh
 
+.ikea-daily-backups:
+  tags:
+    - optimal-novus-runner
+  environment:
+    name: stage
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_CLEAR == "yes"'
+  script:
+    - /automations/runner/ikea-daily-backups.sh
+
 .analyze-backend:
   rules:
     - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
