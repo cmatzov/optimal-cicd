@@ -21,7 +21,7 @@
     - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       changes:
         - net/**/*
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
   tags:
     - optimal-novus-runner
@@ -38,7 +38,7 @@
     - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       changes:
         - js/**/*
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
   tags:
     - optimal-novus-runner
@@ -85,7 +85,7 @@
         - js/packages/web/src/ikea/**/*
         - js/packages/web/src/shared/**/*
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .build-ikea-uat:
@@ -108,7 +108,7 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .build-ikea-stage:
@@ -131,7 +131,7 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .build-ikea-prod:
@@ -155,7 +155,7 @@
   rules:
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
@@ -232,7 +232,7 @@
         - js/packages/web/src/verila/**/*
         - js/packages/web/src/shared/**/*
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .build-verila-uat:
@@ -254,7 +254,7 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .build-verila-stage:
@@ -277,7 +277,7 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .build-verila-prod:
@@ -301,7 +301,7 @@
   rules:
     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       when: manual
@@ -372,7 +372,7 @@
         - js/packages/common/src/kti-api/**/*
         - js/packages/web/src/kti/**/*
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .build-kti-uat:
@@ -394,7 +394,7 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_PROJECT == "kti" && $CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       when: manual
-    - if: $GITLAB_USER_LOGIN == "project_12_bot_ca9523c0e479516ea8ed1deb7f3a8c7c"
+    - if: $GITLAB_USER_LOGIN =~ $UNAUTHORIZED_USERS
       when: never
 
 .docker-build-biovet:
