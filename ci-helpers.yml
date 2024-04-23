@@ -28,11 +28,12 @@
     - cd ./net
     - dotnet tool restore
     - dotnet build
-    - dotnet roslynator analyze | grep "^0 diagnostics found$"
+    - dotnet roslynator analyze | grep "^0 diagnostics found$" > roslynator.txt
     - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
   artifacts:
     paths:
-      - /builds/optimal-projects/optimal/optimal-novus/net/inspectcode.xml
+      - inspectcode.xml
+      - roslynator.txt
     expire_in: 1 day
     when: always
   allow_failure: true
