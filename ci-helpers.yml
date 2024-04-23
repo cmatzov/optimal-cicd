@@ -53,7 +53,12 @@
     - cd packages/mobile
     - npm run install:mobile
     - cd ../..
-    - npm run lint
+    - npm run lint > fe-lint.txt
+  artifacts:
+    paths:
+      - fe-lint.txt
+    expire_in: 1 day
+    when: always
   allow_failure: true
     
 .build-ikea:
