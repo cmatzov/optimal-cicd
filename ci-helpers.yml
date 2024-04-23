@@ -32,7 +32,7 @@
     - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
   artifacts:
     paths:
-      - net/inspectcode.xml
+      - ./net/inspectcode.xml
     expire_in: 1 day
   allow_failure: true
 
