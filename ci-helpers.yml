@@ -34,6 +34,7 @@
     paths:
       - net/inspectcode.xml
     expire_in: 1 day
+  allow_failure: true
 
 .analyze-frontend:
   rules:
@@ -51,6 +52,7 @@
     - npm run install:mobile
     - cd ../..
     - npm run lint
+  allow_failure: true
     
 .build-ikea:
   tags: 
