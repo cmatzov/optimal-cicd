@@ -32,8 +32,8 @@
     - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
   artifacts:
     paths:
-      - inspectcode.xml
-      - roslynator.txt
+      - net/inspectcode.xml
+      - net/roslynator.txt
     expire_in: 1 day
     when: always
   allow_failure: true
@@ -56,7 +56,7 @@
     - npm run lint > fe-lint.txt
   artifacts:
     paths:
-      - fe-lint.txt
+      - js/fe-lint.txt
     expire_in: 1 day
     when: always
   allow_failure: true
