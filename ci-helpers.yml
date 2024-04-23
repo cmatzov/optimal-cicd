@@ -32,7 +32,8 @@
     - dotnet jb inspectcode -o=inspectcode.xml --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
   artifacts:
     paths:
-      - builds/optimal-projects/optimal/optimal-novus/net/inspectcode.xml
+      - net/inspectcode.xml
+    expire_in: 1 day
 
 .analyze-frontend:
   rules:
