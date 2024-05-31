@@ -329,7 +329,7 @@
   script:
     - |
       git fetch --all
-      VERSION=$(/automations/runner/versioning.sh VE prod)
+      VERSION=$(/automations/runner/versioning.sh VE Production)
       export TAG=$VERSION
       echo $TAG > /automations/runner/master-VERILA-TAG.txt
       export PROJECT="verila"
