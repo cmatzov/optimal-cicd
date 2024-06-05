@@ -398,3 +398,14 @@
     - TAG=$TAG ENVIRONMENT=test docker-compose push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
+
+.docker-build-biovet-prod:
+  tags: 
+    - optimal-veteris-runner
+  script:
+    - export TAG=$(/bio-tag.sh)
+    - git fetch --all
+    - TAG=$TAG ENVIRONMENT=Production docker-compose build
+    - TAG=$TAG ENVIRONMENT=Production docker-compose push
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET_PROD == "yes"'
