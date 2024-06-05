@@ -403,7 +403,8 @@
   tags: 
     - optimal-veteris-runner
   script:
-    - export TAG=$(/bio-tag.sh)
+    - export TAG=$(/automations/runner/bio-tag.sh)
+    - echo $TAG > /automations/runner/bio-new-tag.txt
     - git fetch --all
     - TAG=$TAG ENVIRONMENT=Production docker-compose build
     - TAG=$TAG ENVIRONMENT=Production docker-compose push
