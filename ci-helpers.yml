@@ -380,6 +380,7 @@
       echo $TAG > /automations/runner/${BRANCH}-KTI-TAG.txt
       export PROJECT="kti"
       devops/pipelines/build/docker-tmp.sh
+      docker-compose --env-file /automations/runner/.env config 
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
