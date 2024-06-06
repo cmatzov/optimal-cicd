@@ -390,6 +390,8 @@
 .docker-build-biovet:
   tags: 
     - optimal-veteris-runner
+  before-script:
+    - /automation/runner/buildkit.sh
   script:
     - export TAG=$CI_PIPELINE_ID
     - git fetch --all
