@@ -391,7 +391,7 @@
   tags: 
     - optimal-veteris-runner
   before_script:
-    - /automation/runner/buildkit.sh
+    - /automations/runner/buildkit.sh
   script:
     - export TAG=$CI_PIPELINE_ID
     - git fetch --all
