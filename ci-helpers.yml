@@ -425,18 +425,17 @@
   before_script:
     - /automations/runner/buildkit.sh
   script:
-    - |
-      LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
-      LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
-      export TAG=$CI_PIPELINE_ID
-      mkdir mobile && cd mobile
-      cp ${LAST_MOBILE} . && tar xf ${LAST_MOBILE}
-      cd ..
-      mkdir office && cd office
-      cp ${LAST_OFFICE} . && tar xf ${LAST_OFFICE}
-      cd ..
-      TAG="${TAG}" docker-compose build repository
-      TAG="${TAG}" docker-compose push
+    - LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
+    - LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+    - export TAG=$CI_PIPELINE_ID
+    - mkdir mobile && cd mobile
+    - cp ${LAST_MOBILE} . && tar xf ${LAST_MOBILE}
+    - cd ..
+    - mkdir office && cd office
+    - cp ${LAST_OFFICE} . && tar xf ${LAST_OFFICE}
+    - cd ..
+    - TAG="${TAG}" docker-compose build repository
+    - TAG="${TAG}" docker-compose push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
 
