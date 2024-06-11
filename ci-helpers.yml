@@ -428,6 +428,7 @@
     - |
       LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
       LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+      export TAG=$CI_PIPELINE_ID
       mkdir mobile && cd mobile
       cp /automation/biovet/mobile/${LAST_MOBILE}.tar . && tar xf mobile-${LAST_MOBILE}.tar
       cd ..
