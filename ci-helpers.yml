@@ -413,7 +413,7 @@
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
         cd /automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
         cd app/mobile && tar -cf mobile-${TAG}.tar ./* && mv mobile-${TAG}.tar /automations/biovet/mobile
-        cd app/office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /automations/biovet/office
+        cd ../office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /automations/biovet/office
         cd /automations/biovet && rm -rf /automations/biovet/tmp/both
       fi
   rules:
