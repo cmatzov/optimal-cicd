@@ -427,6 +427,7 @@
   script:
     - LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
     - LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+    - echo $LAST_MOBILE $LAST_OFFICE
     - export TAG=$CI_PIPELINE_ID
     - mkdir mobile && cd mobile
     - cp ${LAST_MOBILE} . && tar xf ${LAST_MOBILE}
