@@ -435,7 +435,7 @@
     - cp ${LAST_OFFICE} . && tar xf ${LAST_OFFICE}
     - cd ..
     - TAG="${TAG}" docker-compose build repository
-    - TAG="${TAG}" docker-compose push
+    - TAG="${TAG}" docker-compose push repository
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
 
