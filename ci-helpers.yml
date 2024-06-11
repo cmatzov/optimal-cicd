@@ -387,27 +387,66 @@
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "kti" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
       when: manual
 
-.docker-build-biovet:
+.docker-build-biovet-services:
   tags: 
     - optimal-veteris-runner
   before_script:
     - /automations/runner/buildkit.sh
   script:
-    - export TAG=$CI_PIPELINE_ID
-    - git fetch --all
-    - TAG=$TAG ENVIRONMENT=test docker-compose build
-    - TAG=$TAG ENVIRONMENT=test docker-compose push
+    - |
+      export TAG=$CI_PIPELINE_ID
+      if [ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false"  ]; then
+        mkdir /automations/biovet/tmp/office && chmod 755 /automations/biovet/tmp/office
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
+        cd automations/biovet/tmp/office && tar xf office.tar
+        tar -cf office-${TAG}.tar app/office/* && mv office-${TAG}.tar /automations/biovet/office
+        cd ../../ && rm -rf /tmp/office
+      elif [ "$UPDATE_MOBILE" == "false" && "$UPDATE_OFFICE" == "true" ]; then
+        mkdir /automations/biovet/tmp/mobile && chmod 755 /automations/biovet/tmp/mobile
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
+        cd automations/biovet/tmp/mobile && tar xf mobile.tar
+        tar -cf mobile-${TAG}.tar app/mobile/* && mv mobile-${TAG}.tar /automations/biovet/mobile
+        cd ../../ && rm -rf /tmp/mobile
+      elif [ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]; then
+        mkdir /automations/biovet/tmp/both && chmod 755 /automations/biovet/tmp/both
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
+        cd automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
+        tar -cf mobile-${TAG}.tar app/mobile/* && mv mobile-${TAG}.tar /automations/biovet/mobile
+        tar -cf office-${TAG}.tar app/office/* && mv office-${TAG}.tar /automations/biovet/office
+        cd ../../ && rm -rf /tmp/both
+      fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
 
-.docker-build-biovet-prod:
+.docker-build-biovet-repository:
   tags: 
     - optimal-veteris-runner
+  before_script:
+    - /automations/runner/buildkit.sh
   script:
-    - export TAG=$(/automations/runner/bio-tag.sh)
-    - echo $TAG > /automations/runner/bio-new-tag.txt
-    - git fetch --all
-    - TAG=$TAG ENVIRONMENT=Production docker-compose build
-    - TAG=$TAG ENVIRONMENT=Production docker-compose push
+    - |
+      LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
+      LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+      mkdir mobile && cd mobile
+      cp /automation/biovet/mobile/${LAST_MOBILE}.tar . && tar xf mobile-${LAST_MOBILE}.tar
+      cd ..
+      mkdir office && cd office
+      cp /automation/biovet/office/${LAST_OFFICE}.tar . && tar xf office-${LAST_OFFICE}.tar
+      cd ..
+      TAG="${TAG}" docker-compose build repository
+      TAG="${TAG}" docker-compose push
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET_PROD == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
+
+# .docker-build-biovet-prod:
+#   tags: 
+#     - optimal-veteris-runner
+#   script:
+#     - export TAG=$(/automations/runner/bio-tag.sh)
+#     - echo $TAG > /automations/runner/bio-new-tag.txt
+#     - git fetch --all
+#     - TAG=$TAG ENVIRONMENT=Production docker-compose build
+#     - TAG=$TAG ENVIRONMENT=Production docker-compose push
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET_PROD == "yes"'
