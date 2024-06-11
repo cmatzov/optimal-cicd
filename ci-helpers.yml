@@ -395,26 +395,26 @@
   script:
     - |
       export TAG=$CI_PIPELINE_ID
-      if [ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false"  ]; then
-        mkdir /automations/biovet/tmp/office && chmod 755 /automations/biovet/tmp/office
+      if [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false" ]]; then
+        mkdir -p /automations/biovet/tmp/office && chmod 755 /automations/biovet/tmp/office
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
-        cd automations/biovet/tmp/office && tar xf office.tar
+        cd /automations/biovet/tmp/office && tar xf office.tar
         tar -cf office-${TAG}.tar app/office/* && mv office-${TAG}.tar /automations/biovet/office
-        cd ../../ && rm -rf /tmp/office
-      elif [ "$UPDATE_MOBILE" == "false" && "$UPDATE_OFFICE" == "true" ]; then
-        mkdir /automations/biovet/tmp/mobile && chmod 755 /automations/biovet/tmp/mobile
+        cd /automations/biovet && rm -rf /automations/biovet/tmp/office
+      elif [[ "$UPDATE_MOBILE" == "false" && "$UPDATE_OFFICE" == "true" ]]; then
+        mkdir -p /automations/biovet/tmp/mobile && chmod 755 /automations/biovet/tmp/mobile
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
-        cd automations/biovet/tmp/mobile && tar xf mobile.tar
+        cd /automations/biovet/tmp/mobile && tar xf mobile.tar
         tar -cf mobile-${TAG}.tar app/mobile/* && mv mobile-${TAG}.tar /automations/biovet/mobile
-        cd ../../ && rm -rf /tmp/mobile
-      elif [ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]; then
-        mkdir /automations/biovet/tmp/both && chmod 755 /automations/biovet/tmp/both
+        cd /automations/biovet && rm -rf /automations/biovet/tmp/mobile
+      elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]]; then
+        mkdir -p /automations/biovet/tmp/both && chmod 755 /automations/biovet/tmp/both
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=Test --build-arg version="$TAG" --output type=tar,dest=/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
-        cd automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
+        cd /automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
         tar -cf mobile-${TAG}.tar app/mobile/* && mv mobile-${TAG}.tar /automations/biovet/mobile
         tar -cf office-${TAG}.tar app/office/* && mv office-${TAG}.tar /automations/biovet/office
-        cd ../../ && rm -rf /tmp/both
+        cd /automations/biovet && rm -rf /automations/biovet/tmp/both
       fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
