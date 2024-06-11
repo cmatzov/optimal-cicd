@@ -430,10 +430,10 @@
       LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
       export TAG=$CI_PIPELINE_ID
       mkdir mobile && cd mobile
-      cp /automation/biovet/mobile/${LAST_MOBILE} . && tar xf mobile-${LAST_MOBILE}.tar
+      cp /automations/biovet/mobile/${LAST_MOBILE} . && tar xf mobile-${LAST_MOBILE}.tar
       cd ..
       mkdir office && cd office
-      cp /automation/biovet/office/${LAST_OFFICE} . && tar xf office-${LAST_OFFICE}.tar
+      cp /automations/biovet/office/${LAST_OFFICE} . && tar xf office-${LAST_OFFICE}.tar
       cd ..
       TAG="${TAG}" docker-compose build repository
       TAG="${TAG}" docker-compose push
