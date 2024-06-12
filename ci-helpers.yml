@@ -460,7 +460,8 @@
     - TAG="${TAG}" docker-compose build repository
     - TAG="${TAG}" docker-compose push repository
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"' 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
 
 # .docker-build-biovet-prod:
 #   tags: 
