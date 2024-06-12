@@ -434,10 +434,7 @@
         echo "${LAST_OFFICE}"
         rm -f "${LAST_OFFICE}"
       elif [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
-        LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
-        LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
-        rm -f "${LAST_MOBILE}"
-        rm -f "${LAST_OFFICE}"
+        echo "Rollback to Previous Image"
       fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
@@ -448,18 +445,23 @@
   before_script:
     - /automations/runner/buildkit.sh
   script:
-    - LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
-    - LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
-    - echo $LAST_MOBILE $LAST_OFFICE
-    - export TAG=$CI_PIPELINE_ID
-    - mkdir mobile && cd mobile
-    - cp ${LAST_MOBILE} . && tar xf ${LAST_MOBILE}
-    - cd ..
-    - mkdir office && cd office
-    - cp ${LAST_OFFICE} . && tar xf ${LAST_OFFICE}
-    - cd ..
-    - TAG="${TAG}" docker-compose build repository
-    - TAG="${TAG}" docker-compose push repository
+    - |
+      if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
+        echo "Rollback to Previous Image"
+      else
+        LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
+        LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+        echo $LAST_MOBILE $LAST_OFFICE
+        export TAG=$CI_PIPELINE_ID
+        mkdir mobile && cd mobile
+        cp ${LAST_MOBILE} . && tar xf ${LAST_MOBILE}
+        cd ..
+        mkdir office && cd office
+        cp ${LAST_OFFICE} . && tar xf ${LAST_OFFICE}
+        cd ..
+        TAG="${TAG}" docker-compose build repository
+        TAG="${TAG}" docker-compose push repository
+      fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"' 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
