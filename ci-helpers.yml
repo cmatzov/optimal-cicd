@@ -419,6 +419,28 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
 
+.rollback-biovet-services:
+  tags:
+    - optimal-veteris-runner
+  before_script:
+    - /automations/runner/buildkit.sh
+  script:
+    - |
+      if [[ "$ROLLBACK_MOBILE" == "true" && "ROLLBACK_OFFICE" == "false" ]]; then
+        LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
+        rm -f ${LAST_MOBILE}
+      elif [[ "$ROLLBACK_MOBILE" == "false" && "ROLLBACK_OFFICE" == "true" ]]; then
+        LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+        rm -f ${LAST_OFFICE}
+      elif [[ "$ROLLBACK_MOBILE" == "true" && "ROLLBACK_OFFICE" == "true" ]]; then
+        LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
+        LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+        rm -f ${LAST_MOBILE}
+        rm -f ${LAST_OFFICE}
+      fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
+
 .docker-build-biovet-repository:
   tags: 
     - optimal-veteris-runner
@@ -438,7 +460,7 @@
     - TAG="${TAG}" docker-compose build repository
     - TAG="${TAG}" docker-compose push repository
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
 
 # .docker-build-biovet-prod:
 #   tags: 
