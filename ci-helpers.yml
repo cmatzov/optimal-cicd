@@ -384,9 +384,8 @@
       docker-compose --env-file /automations/runner/.env config 
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "develop" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
-      when: manual
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_UAT_KTI == "yes"'
 
 .build-biovet-service-artifacts:
   tags: 
