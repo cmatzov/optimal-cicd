@@ -117,50 +117,50 @@
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_COMMIT_BRANCH != "kti" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
       when: manual
 
-.build-ikea-stage:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: stage
-  script:
-    - git fetch --all
-    - VERSION=$(/automations/runner/versioning.sh IK Staging)
-    - export TAG=$VERSION
-    - echo $TAG
-    - echo $TAG > /automations/runner/STAGE-IKEA-TAG.txt
-    - export PROJECT="ikea"
-    - devops/pipelines/build/docker-tmp.sh
-    - docker-compose --env-file /automations/runner/.env config
-    - docker-compose --env-file /automations/runner/.env build
-    - docker-compose --env-file /automations/runner/.env push
-    - curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-      when: manual
+# .build-ikea-stage:
+#   tags: 
+#     - optimal-novus-runner
+#   environment:
+#     name: stage
+#   script:
+#     - git fetch --all
+#     - VERSION=$(/automations/runner/versioning.sh IK Staging)
+#     - export TAG=$VERSION
+#     - echo $TAG
+#     - echo $TAG > /automations/runner/STAGE-IKEA-TAG.txt
+#     - export PROJECT="ikea"
+#     - devops/pipelines/build/docker-tmp.sh
+#     - docker-compose --env-file /automations/runner/.env config
+#     - docker-compose --env-file /automations/runner/.env build
+#     - docker-compose --env-file /automations/runner/.env push
+#     - curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+#       when: manual
 
-.build-ikea-prod:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: production
-  script:
-    - |
-      git fetch --all
-      VERSION=$(/automations/runner/versioning.sh IK Production)
-      export TAG=$VERSION
-      echo $TAG > /automations/runner/develop-IKEA-TAG.txt
-      export PROJECT="ikea"
-      export KC_HOSTNAME_URL="ikea.optim-al.com"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
-      when: manual
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-      when: manual
+# .build-ikea-prod:
+#   tags: 
+#     - optimal-novus-runner
+#   environment:
+#     name: production
+#   script:
+#     - |
+#       git fetch --all
+#       VERSION=$(/automations/runner/versioning.sh IK Production)
+#       export TAG=$VERSION
+#       echo $TAG > /automations/runner/develop-IKEA-TAG.txt
+#       export PROJECT="ikea"
+#       export KC_HOSTNAME_URL="ikea.optim-al.com"
+#       devops/pipelines/build/docker-tmp.sh
+#       docker-compose --env-file /automations/runner/.env config
+#       docker-compose --env-file /automations/runner/.env build
+#       docker-compose --env-file /automations/runner/.env push
+#       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
+#       when: manual
+#     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+#       when: manual
 
 .scheduled-docker-ikea-stage:
   rules: 
@@ -255,50 +255,50 @@
     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_COMMIT_BRANCH != "kti" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
       when: manual
 
-.build-verila-stage:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: stage
-  script:
-    - |
-      git fetch --all
-      VERSION=$(/automations/runner/versioning.sh VE Staging)
-      export TAG=$VERSION
-      echo $TAG > /automations/runner/STAGE-VERILA-TAG.txt
-      export PROJECT="verila"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-      when: manual
+# .build-verila-stage:
+#   tags: 
+#     - optimal-novus-runner
+#   environment:
+#     name: stage
+#   script:
+#     - |
+#       git fetch --all
+#       VERSION=$(/automations/runner/versioning.sh VE Staging)
+#       export TAG=$VERSION
+#       echo $TAG > /automations/runner/STAGE-VERILA-TAG.txt
+#       export PROJECT="verila"
+#       devops/pipelines/build/docker-tmp.sh
+#       docker-compose --env-file /automations/runner/.env config
+#       docker-compose --env-file /automations/runner/.env build
+#       docker-compose --env-file /automations/runner/.env push
+#       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "develop" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+#       when: manual
 
-.build-verila-prod:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: production
-  script:
-    - |
-      git fetch --all
-      VERSION=$(/automations/runner/versioning.sh VE Production)
-      export TAG=$VERSION
-      echo $TAG > /automations/runner/develop-VERILA-TAG.txt
-      export PROJECT="verila"
-      export KC_HOSTNAME_URL="cus.verila-bg.com"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
-      when: manual
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-      when: manual
+# .build-verila-prod:
+#   tags: 
+#     - optimal-novus-runner
+#   environment:
+#     name: production
+#   script:
+#     - |
+#       git fetch --all
+#       VERSION=$(/automations/runner/versioning.sh VE Production)
+#       export TAG=$VERSION
+#       echo $TAG > /automations/runner/develop-VERILA-TAG.txt
+#       export PROJECT="verila"
+#       export KC_HOSTNAME_URL="cus.verila-bg.com"
+#       devops/pipelines/build/docker-tmp.sh
+#       docker-compose --env-file /automations/runner/.env config
+#       docker-compose --env-file /automations/runner/.env build
+#       docker-compose --env-file /automations/runner/.env push
+#       curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule"'
+#       when: manual
+#     - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "master" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+#       when: manual
 
 .scheduled-docker-verila-stage:
   rules: 
