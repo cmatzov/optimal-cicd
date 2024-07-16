@@ -304,7 +304,7 @@
 
 .build-kti-stage:
   tags:
-    - optimal-novus-runner
+    - novus-kti-runner
   environment:
     name: stage
   script:
