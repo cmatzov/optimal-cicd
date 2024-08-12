@@ -394,6 +394,7 @@
         mkdir office && cd office
         cp ${LAST_OFFICE} . && tar xf ${LAST_OFFICE}
         cd ..
+        TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose config
         TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose build repository
         TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository
       fi
