@@ -30,7 +30,7 @@
     - dotnet build
     - dotnet roslynator analyze > roslynator.txt
     - cat roslynator.txt | grep "^0 diagnostics found$" 
-    - dotnet jb inspectcode -o=inspectcode.xml -f="xml" --no-build Optimal.Novus.sln && grep "" ./inspectcode.xml
+    - dotnet jb inspectcode -o=inspectcode.xml -f="xml" --no-build Optimal.Novus.sln && grep "<Issues />" ./inspectcode.xml
   artifacts:
     paths:
       - net/inspectcode.xml
