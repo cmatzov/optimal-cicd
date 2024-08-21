@@ -331,25 +331,25 @@
     - |
       export TAG=$CI_PIPELINE_ID
       if [[ "$UPDATE_MOBILE" == "false" && "$UPDATE_OFFICE" == "true" ]]; then
-        mkdir -p /automations/biovet/tmp/office && chmod 755 /automations/biovet/tmp/office
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
-        cd /automations/biovet/tmp/office && tar xf office.tar
-        cd app/office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /automations/biovet/office
-        cd /automations/biovet && rm -rf /automations/biovet/tmp/office
+        mkdir -p /var/automations/biovet/tmp/office && chmod 755 /var/automations/biovet/tmp/office
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
+        cd /var/automations/biovet/tmp/office && tar xf office.tar
+        cd app/office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /var/automations/biovet/office
+        cd /automations/biovet && rm -rf /var/automations/biovet/tmp/office
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false" ]]; then
-        mkdir -p /automations/biovet/tmp/mobile && chmod 755 /automations/biovet/tmp/mobile
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
-        cd /automations/biovet/tmp/mobile && tar xf mobile.tar
-        cd app/mobile && tar -cf mobile-${TAG}.tar ./* && mv mobile-${TAG}.tar /automations/biovet/mobile
-        cd /automations/biovet && rm -rf /automations/biovet/tmp/mobile
+        mkdir -p /var/automations/biovet/tmp/mobile && chmod 755 /var/automations/biovet/tmp/mobile
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
+        cd /var/automations/biovet/tmp/mobile && tar xf mobile.tar
+        cd app/mobile && tar -cf mobile-${TAG}.tar ./* && mv mobile-${TAG}.tar /var/automations/biovet/mobile
+        cd /automations/biovet && rm -rf /var/automations/biovet/tmp/mobile
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]]; then
-        mkdir -p /automations/biovet/tmp/both && chmod 755 /automations/biovet/tmp/both
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
-        cd /automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
-        cd app/mobile && tar -cf mobile-${TAG}.tar ./* && mv mobile-${TAG}.tar /automations/biovet/mobile
-        cd ../office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /automations/biovet/office
-        cd /automations/biovet && rm -rf /automations/biovet/tmp/both
+        mkdir -p /var/automations/biovet/tmp/both && chmod 755 /var/automations/biovet/tmp/both
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
+        cd /var/automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
+        cd app/mobile && tar -cf mobile-${TAG}.tar ./* && mv mobile-${TAG}.tar /var/automations/biovet/mobile
+        cd ../office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /var/automations/biovet/office
+        cd /automations/biovet && rm -rf /var/automations/biovet/tmp/both
       fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
@@ -362,10 +362,10 @@
   script:
     - |
       if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "false" ]]; then
-        LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
+        LAST_MOBILE=$(/var/automations/biovet/last-tag.sh mobile)
         rm -f "${LAST_MOBILE}"
       elif [[ "$ROLLBACK_MOBILE" == "false" && "$ROLLBACK_OFFICE" == "true" ]]; then
-        LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+        LAST_OFFICE=$(/var/automations/biovet/last-tag.sh office)
         echo "${LAST_OFFICE}"
         rm -f "${LAST_OFFICE}"
       elif [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
@@ -384,8 +384,8 @@
       if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
         echo "Rollback to Previous Image"
       else
-        LAST_MOBILE=$(/automations/biovet/last-tag.sh mobile)
-        LAST_OFFICE=$(/automations/biovet/last-tag.sh office)
+        LAST_MOBILE=$(/var/automations/biovet/last-tag.sh mobile)
+        LAST_OFFICE=$(/var/automations/biovet/last-tag.sh office)
         echo $LAST_MOBILE $LAST_OFFICE
         export TAG=$CI_PIPELINE_ID
         mkdir mobile && cd mobile
