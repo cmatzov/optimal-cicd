@@ -325,6 +325,7 @@
 .build-biovet-service-artifacts:
   tags: 
     - optimal-veteris-runner
+    - opt-vpn-runner
   before_script:
     - /automations/runner/buildkit.sh
   script:
@@ -357,6 +358,7 @@
 .rollback-biovet-services:
   tags:
     - optimal-veteris-runner
+    - opt-vpn-runner
   before_script:
     - /automations/runner/buildkit.sh
   script:
@@ -377,6 +379,7 @@
 .docker-build-biovet-repository:
   tags: 
     - optimal-veteris-runner
+    - opt-vpn-runner
   before_script:
     - /automations/runner/buildkit.sh
   script:
