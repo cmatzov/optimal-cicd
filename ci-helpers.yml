@@ -330,22 +330,27 @@
   script:
     - |
       export TAG=$CI_PIPELINE_ID
+      if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
+        export ENVIRONMENT="stage"
+      elif [[ $DEPLOY_BIOVET == "yes" ]]; then
+        export ENVIRONMENT="test"
+      fi
       if [[ "$UPDATE_MOBILE" == "false" && "$UPDATE_OFFICE" == "true" ]]; then
         mkdir -p /var/automations/biovet/tmp/office && chmod 755 /var/automations/biovet/tmp/office
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/office && tar xf office.tar
         cd app/office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /var/automations/biovet/office
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/office
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false" ]]; then
         mkdir -p /var/automations/biovet/tmp/mobile && chmod 755 /var/automations/biovet/tmp/mobile
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/mobile && tar xf mobile.tar
         cd app/mobile && tar -cf mobile-${TAG}.tar ./* && mv mobile-${TAG}.tar /var/automations/biovet/mobile
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/mobile
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]]; then
         mkdir -p /var/automations/biovet/tmp/both && chmod 755 /var/automations/biovet/tmp/both
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=test --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
         cd app/mobile && tar -cf mobile-${TAG}.tar ./* && mv mobile-${TAG}.tar /var/automations/biovet/mobile
         cd ../office && tar -cf office-${TAG}.tar ./* && mv office-${TAG}.tar /var/automations/biovet/office
