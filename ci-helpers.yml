@@ -353,7 +353,7 @@
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/both
       fi
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes"'
 
 .rollback-biovet-services:
   tags:
@@ -402,7 +402,7 @@
         TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository server gateway
       fi
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes"' 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes"' 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
 
 # .docker-build-biovet-prod:
