@@ -329,32 +329,36 @@
     - /automations/runner/buildkit.sh
   script:
     - |
-      export TAG=$CI_PIPELINE_ID
+      export VERSION=$CI_PIPELINE_ID
       if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
         export ENVIRONMENT="stage"
       elif [[ $DEPLOY_BIOVET == "yes" ]]; then
         export ENVIRONMENT="test"
+      else
+        echo "How did you trigger this job anyway, slick?"
       fi
       if [[ "$UPDATE_MOBILE" == "false" && "$UPDATE_OFFICE" == "true" ]]; then
         mkdir -p /var/automations/biovet/tmp/office && chmod 755 /var/automations/biovet/tmp/office
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/office && tar xf office.tar
-        cd app/office && tar -cf office-${TAG}.tar ./* && curl --upload-file office-${TAG}.tar "https://registry.optim-al.com/repository/veteris-artifacts/office/office-${TAG}.tar"
+        cd app/office && tar -cf office-${VERSION}.tar ./* && curl --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/office
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false" ]]; then
         mkdir -p /var/automations/biovet/tmp/mobile && chmod 755 /var/automations/biovet/tmp/mobile
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/mobile && tar xf mobile.tar
-        cd app/mobile && tar -cf mobile-${TAG}.tar ./* && curl --upload-file mobile-${TAG}.tar "https://registry.optim-al.com/repository/veteris-artifacts/mobile/mobile-${TAG}.tar"
+        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/mobile
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]]; then
         mkdir -p /var/automations/biovet/tmp/both && chmod 755 /var/automations/biovet/tmp/both
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
-        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${TAG}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
-        cd app/mobile && tar -cf mobile-${TAG}.tar ./* && curl --upload-file mobile-${TAG}.tar "https://registry.optim-al.com/repository/veteris-artifacts/mobile/mobile-${TAG}.tar"
-        cd ../office && tar -cf office-${TAG}.tar ./* && curl --upload-file office-${TAG}.tar "https://registry.optim-al.com/repository/veteris-artifacts/office/office-${TAG}.tar"
+        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
+        cd ../office && tar -cf office-${VERSION}.tar ./* && curl --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/both
+      else
+        echo "You messed up the variables silly! Go again and check them! Set to true whatever you want to update and to false what you don't want to update! If you set them both to false then why are you running this job?"
       fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes"'
@@ -366,17 +370,26 @@
     - /automations/runner/buildkit.sh
   script:
     - |
+      if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
+        export ENVIRONMENT="stage"
+      elif [[ $DEPLOY_BIOVET == "yes" ]]; then
+        export ENVIRONMENT="test"
+      else
+        echo "How did you trigger this job anyway, slick?"
+      fi
       if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "false" ]]; then
-        LAST_MOBILE=$(/var/automations/biovet/last-id.sh mobile)
+        LAST_MOBILE=$(/var/automations/biovet/last-id.sh mobile $ENVIRONMENT)
         curl -X DELETE "https://registry.optim-al.com/service/rest/v1/assets/${LAST_MOBILE}"
       elif [[ "$ROLLBACK_MOBILE" == "false" && "$ROLLBACK_OFFICE" == "true" ]]; then
-        LAST_OFFICE=$(/var/automations/biovet/last-id.sh office)
+        LAST_OFFICE=$(/var/automations/biovet/last-id.sh office $ENVIRONMENT)
         curl -X DELETE "https://registry.optim-al.com/service/rest/v1/assets/${LAST_OFFICE}"
       elif [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
-        echo "Rollback to Previous Image"
+        echo "Deploying former image..."
+      else
+        echo "How did you even mess this up? Check variables and branches and retry."
       fi
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true" || $ROLLBACK_BIOVET_STAGE == "true"'
 
 .docker-build-biovet-repository:
   tags: 
@@ -385,35 +398,30 @@
     - /automations/runner/buildkit.sh
   script:
     - |
-      if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
-        echo "Rollback to Previous Image"
-      else
-        LAST_MOBILE=$(/var/automations/biovet/last-tag.sh mobile)
-        LAST_OFFICE=$(/var/automations/biovet/last-tag.sh office)
-        echo $LAST_MOBILE $LAST_OFFICE
+      if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
+        export ENVIRONMENT="stage"
         export TAG=$CI_PIPELINE_ID
+      elif [[ $DEPLOY_BIOVET == "yes" ]]; then
+        export ENVIRONMENT="test"
+        export TAG=$(/var/automations/biovet/bio-tag.sh)
+      else
+        echo "How did you trigger this job anyway, slick?"
+      fi
+      if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
+        echo "Skipping the build step..."
+      else
+        LAST_MOBILE=$(/var/automations/biovet/last-tag.sh mobile $ENVIRONMENT)
+        LAST_OFFICE=$(/var/automations/biovet/last-tag.sh office $ENVIRONMENT)
+        echo $LAST_MOBILE $LAST_OFFICE
         mkdir mobile && cd mobile
         curl -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_MOBILE}" && tar xf mobile-*.tar
         cd ..
         mkdir office && cd office
         curl -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_OFFICE}" && tar xf office-*.tar
         cd ..
-        TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose config
-        TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose build repository server gateway
-        TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository server gateway
+        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose build repository
+        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository
       fi
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes"' 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true"'
-
-# .docker-build-biovet-prod:
-#   tags: 
-#     - optimal-veteris-runner
-#   script:
-#     - export TAG=$(/automations/runner/bio-tag.sh)
-#     - echo $TAG > /automations/runner/bio-new-tag.txt
-#     - git fetch --all
-#     - TAG=$TAG ENVIRONMENT=Production docker-compose build
-#     - TAG=$TAG ENVIRONMENT=Production docker-compose push
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET_PROD == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLBACK_BIOVET == "true" || $ROLLBACK_BIOVET_STAGE == "true"'
