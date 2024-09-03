@@ -367,7 +367,7 @@
   tags:
     - $BIOVET_RUNNER
   before_script:
-    - /automations/runner/buildkit.sh
+    - apk add jq
   script:
     - |
       if [[ $ROLLBACK_BIOVET_STAGE == "true" ]]; then
