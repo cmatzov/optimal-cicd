@@ -370,9 +370,9 @@
     - /automations/runner/buildkit.sh
   script:
     - |
-      if [[ $ROLLBACK_BIOVET_STAGE == "yes" ]]; then
+      if [[ $ROLLBACK_BIOVET_STAGE == "true" ]]; then
         export ENVIRONMENT="stage"
-      elif [[ $ROLLBACK_BIOVET == "yes" ]]; then
+      elif [[ $ROLLBACK_BIOVET == "true" ]]; then
         export ENVIRONMENT="test"
       else
         echo "How did you trigger this job anyway, slick?"
@@ -398,10 +398,10 @@
     - apk add jq
   script:
     - |
-      if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
+      if [[ $DEPLOY_BIOVET_STAGE == "yes" || $ROLLBACK_BIOVET_STAGE == "true" ]]; then
         export ENVIRONMENT="stage"
         export TAG=$(/var/automations/biovet/bio-tag.sh)
-      elif [[ $DEPLOY_BIOVET == "yes" ]]; then
+      elif [[ $DEPLOY_BIOVET == "yes" || $ROLLBACK_BIOVET == "true" ]]; then
         export ENVIRONMENT="test"
         export TAG=$CI_PIPELINE_ID
       else
