@@ -395,7 +395,7 @@
   tags: 
     - $BIOVET_RUNNER
   before_script:
-    - apt-get install -y jq
+    - apk add jq
   script:
     - |
       if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
