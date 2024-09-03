@@ -400,7 +400,7 @@
     - |
       if [[ $DEPLOY_BIOVET_STAGE == "yes" || $ROLLBACK_BIOVET_STAGE == "true" ]]; then
         export ENVIRONMENT="stage"
-        export TAG=$(/var/automations/biovet/bio-tag.sh)
+        export TAG="0.1.9-beta"
       elif [[ $DEPLOY_BIOVET == "yes" || $ROLLBACK_BIOVET == "true" ]]; then
         export ENVIRONMENT="test"
         export TAG=$CI_PIPELINE_ID
