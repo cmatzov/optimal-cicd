@@ -341,21 +341,21 @@
         mkdir -p /var/automations/biovet/tmp/office && chmod 755 /var/automations/biovet/tmp/office
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/office && tar xf office.tar
-        cd app/office && tar -cf office-${VERSION}.tar ./* && curl -u '$REGISTRY_LOGIN' --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
+        cd app/office && tar -cf office-${VERSION}.tar ./* && curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/office
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false" ]]; then
         mkdir -p /var/automations/biovet/tmp/mobile && chmod 755 /var/automations/biovet/tmp/mobile
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/mobile && tar xf mobile.tar
-        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl -u '$REGISTRY_LOGIN' --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
+        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/mobile
       elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]]; then
         mkdir -p /var/automations/biovet/tmp/both && chmod 755 /var/automations/biovet/tmp/both
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
-        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl -u '$REGISTRY_LOGIN' --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
-        cd ../office && tar -cf office-${VERSION}.tar ./* && curl -u '$REGISTRY_LOGIN' --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
+        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
+        cd ../office && tar -cf office-${VERSION}.tar ./* && curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
         cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/both
       else
         echo "You messed up the variables silly! Go again and check them! Set to true whatever you want to update and to false what you don't want to update! If you set them both to false then why are you running this job?"
@@ -379,10 +379,10 @@
       fi
       if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "false" ]]; then
         LAST_MOBILE=$(/var/automations/biovet/last-id.sh mobile $ENVIRONMENT)
-        curl -X DELETE -u '$REGISTRY_LOGIN' "https://registry.optim-al.com/service/rest/v1/assets/${LAST_MOBILE}"
+        curl -X DELETE -u '$REGISTRY_USER:$REGISTRY_PASSWORD' "https://registry.optim-al.com/service/rest/v1/assets/${LAST_MOBILE}"
       elif [[ "$ROLLBACK_MOBILE" == "false" && "$ROLLBACK_OFFICE" == "true" ]]; then
         LAST_OFFICE=$(/var/automations/biovet/last-id.sh office $ENVIRONMENT)
-        curl -X DELETE -u '$REGISTRY_LOGIN' "https://registry.optim-al.com/service/rest/v1/assets/${LAST_OFFICE}"
+        curl -X DELETE -u '$REGISTRY_USER:$REGISTRY_PASSWORD' "https://registry.optim-al.com/service/rest/v1/assets/${LAST_OFFICE}"
       elif [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
         echo "Deploying former image..."
       else
@@ -414,10 +414,10 @@
         LAST_OFFICE=$(/var/automations/biovet/last-tag.sh office $ENVIRONMENT)
         echo $LAST_MOBILE $LAST_OFFICE
         mkdir mobile && cd mobile
-        curl -u '$REGISTRY_LOGIN' -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_MOBILE}" && tar xf mobile-*.tar
+        curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_MOBILE}" && tar xf mobile-*.tar
         cd ..
         mkdir office && cd office
-        curl -u '$REGISTRY_LOGIN' -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_OFFICE}" && tar xf office-*.tar
+        curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_OFFICE}" && tar xf office-*.tar
         cd ..
         ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose build repository server gateway
         ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository server gateway
