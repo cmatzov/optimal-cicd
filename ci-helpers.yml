@@ -354,11 +354,9 @@
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
         ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
         cd /var/automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
-        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && mv mobile-${VERSION}.tar /var/automations/biovet/
-        cd ../office && tar -cf office-${VERSION}.tar ./* && mv office-${VERSION}.tar /var/automations/biovet/
-        cd /var/automations/biovet/
-        curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
-        curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
+        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
+        cd ../office && tar -cf office-${VERSION}.tar ./* && curl -u '$REGISTRY_USER:$REGISTRY_PASSWORD' --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
+        cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/both
       else
         echo "You messed up the variables silly! Go again and check them! Set to true whatever you want to update and to false what you don't want to update! If you set them both to false then why are you running this job?"
       fi
