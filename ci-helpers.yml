@@ -400,10 +400,10 @@
     - |
       if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
         export ENVIRONMENT="stage"
-        export TAG=$CI_PIPELINE_ID
+        export TAG=$(/var/automations/biovet/bio-tag.sh)
       elif [[ $DEPLOY_BIOVET == "yes" ]]; then
         export ENVIRONMENT="test"
-        export TAG=$(/var/automations/biovet/bio-tag.sh)
+        export TAG=$CI_PIPELINE_ID
       else
         echo "How did you trigger this job anyway, slick?"
       fi
@@ -419,8 +419,8 @@
         mkdir office && cd office
         curl -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_OFFICE}" && tar xf office-*.tar
         cd ..
-        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose build repository
-        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository
+        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose build repository server gateway
+        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository server gateway
       fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes"'
