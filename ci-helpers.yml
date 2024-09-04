@@ -400,7 +400,8 @@
     - |
       if [[ $DEPLOY_BIOVET_STAGE == "yes" || $ROLLBACK_BIOVET_STAGE == "true" ]]; then
         export ENVIRONMENT="stage"
-        export TAG="0.2.0-beta"
+        export LAST_TAG=$(/var/automations/biovet/repo-tag.sh deploy stage)
+        export TAG=$(/var/automations/biovet/versioning.sh $LAST_TAG)
       elif [[ $DEPLOY_BIOVET == "yes" || $ROLLBACK_BIOVET == "true" ]]; then
         export ENVIRONMENT="test"
         export TAG=$CI_PIPELINE_ID
