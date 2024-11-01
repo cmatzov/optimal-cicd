@@ -321,7 +321,7 @@
       docker-compose --env-file /automations/runner/.env build
       docker-compose --env-file /automations/runner/.env push
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_KTI == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_KTI == "yes"'
 
 .build-biovet-service-artifacts:
   tags: 
