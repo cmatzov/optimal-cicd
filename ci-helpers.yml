@@ -309,12 +309,13 @@
     name: stage
   script:
       git fetch --all
-      VERSION=$(/automations/runner/versioning.sh KT Staging)
+      VERSION=$(/automations/runner/kti-tag.sh)
       export TAG=$VERSION
-      echo $TAG > /automations/runner/STAGE-KTI-TAG.txt
       export PROJECT="kti"
       export KC_EXTERNAL_URL="https://testmrp.ktinternational.eu/auth"
       export KC_HOSTNAME_URL="https://testmrp.ktinternational.eu"
+      export KC_ADMIN_USER="mrpadmin"
+      export KC_ADMIN_PASS="Plovdiv@2024"
       devops/pipelines/build/docker-tmp.sh
       docker-compose --env-file /automations/runner/.env config
       docker-compose --env-file /automations/runner/.env build
