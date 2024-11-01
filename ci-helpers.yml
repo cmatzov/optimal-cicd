@@ -308,6 +308,7 @@
   environment:
     name: stage
   script:
+    - |
       git fetch --all
       VERSION=$(/automations/runner/kti-tag.sh)
       export TAG=$VERSION
