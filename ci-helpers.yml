@@ -18,7 +18,7 @@
 
 .analyze-backend:
   rules:
-    - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
+    - if: '$CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
       changes:
         - net/**/*
   tags:
@@ -41,7 +41,7 @@
 
 .analyze-frontend:
   rules:
-    - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
+    - if: '$CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
       changes:
         - js/**/*
   tags:
@@ -61,268 +61,166 @@
     expire_in: 1 day
     when: always
   allow_failure: true
-    
-.build-ikea:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: test
-  script:
-    - |
-      git fetch --all
-      TAG=$CI_PIPELINE_ID
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      export TAG=$TAG
-      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
-      export PROJECT="ikea"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-  rules:
-    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_COMMIT_BRANCH != "kti" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "web" && $CI_COMMIT_TAG == null'
-      changes:
-        - net/ikea/**/*
-        - net/shared/**/*
-        - js/package.json
-        - js/apps/mobile/package.json
-        - js/apps/mobile/src/ikea/**/*
-        - js/apps/mobile/src/shared/**/*
-        - js/packages/common/package.json
-        - js/packages/common/src/ikea-api/**/*
-        - js/packages/common/src/shared/**/*
-        - js/packages/web/package.json
-        - js/packages/web/src/ikea/**/*
-        - js/packages/web/src/shared/**/*
-      when: manual
 
-.build-ikea-uat:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: uat
-  script:
-    - |
-      git fetch --all
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      TAG=$CI_PIPELINE_ID
-      export TAG=$TAG
-      echo $TAG > /automations/runner/${BRANCH}-IKEA-TAG.txt
-      export PROJECT="ikea"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_BRANCH !~ /^kti\/.*$/ && $CI_COMMIT_TAG == null'
-      when: manual
-
-.scheduled-docker-ikea-stage:
-  rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_IKEA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: stage
-  script:
-    - git fetch --all
-    - TAG=$(/automations/runner/versioning.sh IK Staging)
-    - export TAG=$TAG
-    - echo $TAG > /automations/runner/STAGE-IKEA-TAG.txt
-    - export PROJECT="ikea"
-    - export KC_EXTERNAL_URL="https://stage.optim-al.app/auth"
-    - export KC_HOSTNAME_URL="https://stage.optim-al.app"
-    - devops/pipelines/build/docker-tmp.sh
-    - docker-compose --env-file /automations/runner/.env config
-    - docker-compose --env-file /automations/runner/.env build
-    - docker-compose --env-file /automations/runner/.env push
-    - curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-
-.scheduled-docker-ikea-prod:
-  rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_IKEA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: production
-  script:
-    - |
-      git fetch --all
-      TAG=$(/automations/runner/versioning.sh IK Production)
-      export TAG=$TAG
-      echo $TAG > /automations/runner/master-IKEA-TAG.txt
-      export PROJECT="ikea"
-      export KC_HOSTNAME_URL="ikea.optim-al.com"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-
-.build-verila:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: test
-  script:
-    - |
-      git fetch --all
-      TAG=$CI_PIPELINE_ID
-      export TAG=$TAG
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
-      export PROJECT="verila"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-  rules:
-    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_COMMIT_BRANCH != "kti" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "web" && $CI_COMMIT_TAG == null'
-      changes:
-        - net/verila/**/*
-        - net/shared/**/*
-        - js/package.json
-        - js/apps/mobile/package.json
-        - js/apps/mobile/src/verila/**/*
-        - js/apps/mobile/src/shared/**/*
-        - js/packages/common/package.json
-        - js/packages/common/src/verila-api/**/*
-        - js/packages/common/src/shared/**/*
-        - js/packages/web/package.json
-        - js/packages/web/src/verila/**/*
-        - js/packages/web/src/shared/**/*
-      when: manual
-
-.build-verila-uat:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: uat
-  script:
-    - |
-      git fetch --all
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      TAG=$CI_PIPELINE_ID
-      export TAG=$TAG
-      echo $TAG > /automations/runner/${BRANCH}-VERILA-TAG.txt
-      export PROJECT="verila"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_BRANCH !~ /^kti\/.*$/ && $CI_COMMIT_TAG == null'
-      when: manual
-
-.scheduled-docker-verila-stage:
-  rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_VERILA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: stage
-  script:
-    - |
-      git fetch --all
-      TAG=$(/automations/runner/versioning.sh VE Staging)
-      export TAG=$TAG
-      echo $TAG > /automations/runner/STAGE-VERILA-TAG.txt
-      export PROJECT="verila"
-      export KC_EXTERNAL_URL="https://stage.optim-al.app/auth"
-      export KC_HOSTNAME_URL="https://stage.optim-al.app"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-
-.scheduled-docker-verila-prod:
-  rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_PROD_VERILA == "yes" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: production
-  script:
-    - |
-      git fetch --all
-      TAG=$(/automations/runner/versioning.sh VE Production)
-      export TAG=$TAG
-      echo $TAG > /automations/runner/master-VERILA-TAG.txt
-      export PROJECT="verila"
-      export KC_HOSTNAME_URL="cus.verila-bg.com"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-      curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-
-.build-kti:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: test
-  script:
-    - |
-      git fetch --all
-      export VERSION=$CI_PIPELINE_ID
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      export TAG=$VERSION
-      echo $TAG > /automations/runner/${BRANCH}-KTI-TAG.txt
-      export PROJECT="kti"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-  rules:
-    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "web" && $CI_COMMIT_TAG == null'
-      changes:
-        - net/kti/**/*
-        - js/apps/mobile/src/kti/**/*
-        - js/packages/common/src/kti-api/**/*
-        - js/packages/web/src/kti/**/*
-      when: manual
-    - if: '$CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH =~ /^kti\/.*$/'
-
-.build-kti-uat:
-  tags: 
-    - optimal-novus-runner
-  environment:
-    name: uat
-  script:
-    - |
-      git fetch --all
-      BRANCH=$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')
-      export VERSION=$CI_PIPELINE_ID
-      export TAG=$VERSION
-      echo $TAG > /automations/runner/${BRANCH}-KTI-TAG.txt
-      export PROJECT="kti"
-      devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config 
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
-  rules: 
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_UAT_KTI == "yes"'
-
-.build-kti-stage:
+.select-environment:
   tags:
-    - opt-vpn-runner
+    - optimal-novus-runner
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "master" || "$CI_COMMIT_BRANCH" =~ .+\/hotfix\/.+ ]]; then
+        export environment="production"
+      elif [[ "$CI_COMMIT_BRANCH" == "develop" || "$CI_COMMIT_BRANCH" =~ .+\/release\/.+ ]]; then
+        export environment="staging"
+      elif [[ "$CI_COMMIT_BRANCH" =~ .+\/feature\/.+ || "$CI_COMMIT_BRANCH" =~ .+\/bugfix\/.+ || "$CI_COMMIT_BRANCH" =~ .+\/fix\/.+ ]]; then
+        export environment="test"
+      else
+        echo "Invalid Branch Name"
+        exit 1
+      fi
+      echo "environment=$environment" > .env
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && "$DEPLOY_IKEA" == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true"'
+
+.create-tag:
+  tags:
+    - optimal-novus-runner
+  script:
+    - |
+      LAST_TAG=$(git tag -l "*-$PROJECT" | sort -V | tail -1)
+      IFS='-.' read -r -a tag_components <<< "$LAST_TAG"
+      MAJOR=${tag_components[0]}
+      MINOR=${tag_components[1]}
+      PATCH=${tag_components[2]}
+      if [[ "$CI_COMMIT_BRANCH" == "master" ]]; then
+        MINOR=$((MINOR + 1))
+        PATCH=0
+        NEW_TAG="$MAJOR.$MINOR.$PATCH-$PROJECT"
+        echo $NEW_TAG
+        curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${NEW_TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+      elif [[ "$CI_COMMIT_BRANCH" =~ .+\/hotfix\/.+ ]]; then
+        PATCH=$((PATCH + 1))
+        echo $NEW_TAG
+        NEW_TAG="MAJOR.$MINOR.$PATCH-$PROJECT"
+        curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${NEW_TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+      elif [[ "$CI_COMMIT_BRANCH" == "develop" || "$CI_COMMIT_BRANCH" =~ .+\/release\/.+ ]]; then
+        MINOR=$((MINOR + 1))
+        PATCH=0
+        NEW_TAG="$MAJOR.$MINOR.$PATCH-rc-$PROJECT"
+        echo $NEW_TAG
+      else
+        NEW_TAG="$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')"
+      fi
+      echo "TAG=$NEW_TAG" >> .env
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && "$DEPLOY_IKEA" == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true"'
+
+.setup_build:
+  tags:
+    - optimal-novus-runner
   environment:
-    name: stage
+    name: $environment
+  script:
+    - |
+      if "$DEPLOY_KTI" == "true"; then
+        echo VERSION=$TAG >> .env
+        echo PROJECT="kti" >> .env
+        case $environment in
+          test)
+            echo KC_HOSTNAME_URL="https://kti.uat.optim-al.com" >> .env
+            echo KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> .env ;;
+          staging) 
+            echo KC_HOSTNAME_URL="https://testmrp.ktinternational.eu" >> .env
+            echo KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> .env
+            echo KC_ADMIN_USER="mrpadmin" >> .env
+            echo KC_ADMIN_PASS="Plovdiv@2024" >> .env ;;
+          *)
+            echo "The selected environment is not available" ;;
+        esac
+      elif "$DEPLOY_IKEA" == "true"; then
+        export PROJECT="ikea" && echo PROJECT="ikea" >> .env
+        case $environment in
+          test)
+            LXC=$(ssh -p 2266 optimal@192.168.66.11 "bash -s" << 'EOF'
+            #!/bin/bash
+            CONTAINERS=\$(lxc list --format csv --columns=n | grep opt-tst)
+            for container in \$CONTAINERS; do
+                status=\$(lxc info \$container | grep "Status" | awk '{print \$2}')
+                if [ "\$status" == "STOPPED" ]; then
+                    echo "\$container"
+                    break
+                fi
+            done
+            EOF
+            )
+            if [[ -z "$LXC" ]]; then
+              echo "All environments are busy"
+              exit 1
+            else
+              echo "$PROJECT will be deployed on $LXC"
+              echo "LXC=$LXC" >> .env
+            fi ;;
+          staging) 
+            echo KC_HOSTNAME_URL="https://stage.optim-al.app" >> .env
+            echo KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> .env ;;
+          production) 
+            echo KC_HOSTNAME_URL="https://ikea.optim-al.com" >> .env
+            echo KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> .env ;;
+          *)
+            echo "The selected environment is not available" ;;
+        esac
+      elif "$DEPLOY_VERILA" == "true"; then
+        export PROJECT="verila" && echo PROJECT="verila" >> .env
+        case $environment in
+          test)
+            LXC=$(ssh -p 2266 optimal@192.168.66.11 "bash -s" << 'EOF'
+            #!/bin/bash
+            CONTAINERS=\$(lxc list --format csv --columns=n | grep opt-tst)
+            for container in \$CONTAINERS; do
+                status=\$(lxc info \$container | grep "Status" | awk '{print \$2}')
+                if [ "\$status" == "STOPPED" ]; then
+                    echo "\$container"
+                    break
+                fi
+            done
+            EOF
+            )
+            if [[ -z "$LXC" ]]; then
+              echo "All environments are busy"
+              exit 1
+            else
+              echo "$PROJECT will be deployed on $LXC"
+              echo "LXC=$LXC" >> .env
+            fi ;;
+          staging) 
+            echo KC_HOSTNAME_URL="https://stage.optim-al.app" >> .env
+            echo KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> .env ;;
+          production) 
+            echo KC_HOSTNAME_URL="https://cus.verila-bg.com" >> .env
+            echo KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> .env ;;
+          *)
+            echo "The selected environment is not available" ;;
+        esac
+      else
+        echo "Check pipeline schedule parameters and retry"
+      fi
+      echo "Building now "$PROJECT" to "$environment""
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && "$DEPLOY_IKEA" == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true"'
+
+.build-step:
+  tags:
+    - optimal-novus-runner
+  environment:
+    name: $environment
   script:
     - |
       git fetch --all
-      export VERSION=$(/automations/runner/kti-tag.sh)
-      export TAG=$VERSION
-      export PROJECT="kti"
-      export KC_EXTERNAL_URL="https://testmrp.ktinternational.eu/auth"
-      export KC_HOSTNAME_URL="https://testmrp.ktinternational.eu"
-      export KC_ADMIN_USER="mrpadmin"
-      export KC_ADMIN_PASS="Plovdiv@2024"
       devops/pipelines/build/docker-tmp.sh
-      docker-compose --env-file /automations/runner/.env config
-      docker-compose --env-file /automations/runner/.env build
-      docker-compose --env-file /automations/runner/.env push
+      docker-compose --env-file .env config
+      docker-compose --env-file .env build
+      docker-compose --env-file .env push
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_STAGE_KTI == "yes"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && "$DEPLOY_IKEA" == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true"'
 
 .build-biovet-service-artifacts:
   tags: 

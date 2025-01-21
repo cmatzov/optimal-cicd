@@ -1,0 +1,90 @@
+include:
+  - project: 'devops-campus/ci-cd/ci-helpers'
+    ref: refactor-ci
+    file: 
+      - 'ci-helpers.yml'
+  - project: 'devops-campus/ci-cd/cd-helpers'
+    ref: refactor-cd
+    file: 
+      - 'cd-helpers.yml'
+  - project: 'optimal-projects/optimal/ci-automation'
+    ref: main
+    file:
+      - 'automation-helpers.yml'
+
+stages:
+  - backup
+  - restore
+  - analyze
+  - select-env
+  - setup
+  - build
+  - deploy
+  - clear
+  - rollback
+
+Daily Backups:
+  extends: .ikea-daily-backups
+  stage: backup
+
+Restore Database:
+  extends: .clear-test-and-db-restore
+  stage: restore
+
+Backend Analyze:
+ extends: .analyze-backend
+ stage: analyze
+
+Frontend Analyze:
+ extends: .analyze-frontend
+ stage: analyze
+
+Select environment:
+  extends: .select-environment
+  stage: select-env
+
+Setup Build:
+  extends: .setup_build
+  stage: setup
+
+Build Ikea:
+  extends: .build-step
+  stage: build
+
+Build Verila:
+  extends: .build-step
+  stage: build
+
+Build KTI:
+  extends: .build-step
+  stage: build
+
+Deploy Ikea:
+  extends: .deploy-step
+  stage: deploy
+  needs:
+   - Build Ikea
+
+Deploy Verila:
+  extends: .deploy-step
+  stage: deploy
+  needs:
+   - Build Verila
+
+Deploy KTI:
+  extends: .deploy-step
+  stage: deploy
+  needs:
+    - Build KTI
+
+Clear Test environment:
+  extends: .clear-test-environments
+  stage: clear
+
+Rollback Stage:
+  extends: .rollback-stage
+  stage: rollback
+
+Rollback Prod:
+  extends: .rollback-prod
+  stage: rollback
