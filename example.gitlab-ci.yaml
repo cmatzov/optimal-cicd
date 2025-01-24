@@ -16,9 +16,9 @@ stages:
   - backup
   - restore
   - analyze
-  - select-env
-  - setup
+  - tag
   - build
+  - select-test-machine
   - deploy
   - clear
   - rollback
@@ -39,47 +39,65 @@ Frontend Analyze:
  extends: .analyze-frontend
  stage: analyze
 
-Select environment:
-  extends: .select-environment
-  stage: select-env
+Create Tag and Select environment:
+  extends: .create-tag-and-select-environment
+  stage: tag
 
-Setup Build:
-  extends: .setup_build
-  stage: setup
+HotFix Build Tag:
+  extends: .hotfix-build-tag
+  stage: tag
 
 Build Ikea:
   extends: .build-step
   stage: build
+  variables:
+    PROJECT: "ikea"
 
 Build Verila:
   extends: .build-step
   stage: build
+  variables:
+    PROJECT: "verila"
 
 Build KTI:
   extends: .build-step
   stage: build
+  variables:
+    PROJECT: "kti"
+
+Select Test Machine:
+  extends: .select-test-machine
+  stage: select-test-machine
 
 Deploy Ikea:
   extends: .deploy-step
   stage: deploy
   needs:
    - Build Ikea
+  variables:
+    PROJECT: "ikea"
 
 Deploy Verila:
   extends: .deploy-step
   stage: deploy
   needs:
    - Build Verila
+  variables:
+    PROJECT: "verila"
 
 Deploy KTI:
   extends: .deploy-step
   stage: deploy
   needs:
     - Build KTI
+  variables:
+    PROJECT: "kti"
 
 Clear Test environment:
   extends: .clear-test-environments
   stage: clear
+  needs:
+   - Select Test Machine
 
 Rollback Stage:
   extends: .rollback-stage
