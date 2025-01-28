@@ -151,6 +151,7 @@
   script:
     - export $(cat cache.env | xargs -d \n)
     - |
+      echo "proj is $PROJECT and env is $environment"
       echo "variable is: $KC_HOSTNAME_URL"
       export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
