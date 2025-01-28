@@ -133,26 +133,9 @@
     - $RUNNER
   environment:
     name: $environment
-  rules:
-    - if: '$PROJECT == "kti" && $environment == "test"'
-      variables:
-        KC_HOSTNAME_URL: "https://kti.uat.optim-al.com"
-    - if: '$PROJECT == "kti" && $environment == "stage"'
-      variables:
-        KC_HOSTNAME_URL: "https://testmrp.ktinternational.eu"
-        KC_ADMIN_USER: "mrpadmin"
-        KC_ADMIN_PASS: "Plovdiv@2024"
-    - if: '$PROJECT == "ikea" && $environment == "production"'
-      variables:
-        KC_HOSTNAME_URL: "https://ikea.optim-al.com"
-    - if: '$PROJECT == "verila" && $environment == "production"'
-      variables:
-        KC_HOSTNAME_URL: "https://cus.verila-bg.com"
   script:
     - export $(cat cache.env | xargs -d \n)
     - |
-      echo "proj is $PROJECT and env is $environment"
-      echo "variable is: $KC_HOSTNAME_URL"
       export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
       git fetch --all
