@@ -149,7 +149,7 @@
       variables:
         KC_HOSTNAME_URL: "https://cus.verila-bg.com"
   script:
-    - eval $(cache.env)
+    - eval $(cat cache.env)
     - |
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
       git fetch --all
