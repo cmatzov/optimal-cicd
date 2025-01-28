@@ -136,22 +136,22 @@
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
     - if: '$environment == "test" && $PROJECT == "kti"'
       variables:
-        KEYCLOAK_HOSTNAME_URL: "https://kti.uat.optim-al.com"
+        KC_HOSTNAME_URL: "https://kti.uat.optim-al.com"
     - if: '$environment == "stage" && $PROJECT == "kti"'
       variables:
-        KEYCLOAK_HOSTNAME_URL: "https://testmrp.ktinternational.eu"
+        KC_HOSTNAME_URL: "https://testmrp.ktinternational.eu"
         KC_ADMIN_USER: "mrpadmin"
         KC_ADMIN_PASS: "Plovdiv@2024"
     - if: '$environment == "production" && $PROJECT == "ikea"'
       variables:
-        KEYCLOAK_HOSTNAME_URL: "https://ikea.optim-al.com"
+        KC_HOSTNAME_URL: "https://ikea.optim-al.com"
     - if: '$environment == "production" && $PROJECT == "verila"'
       variables:
-        KEYCLOAK_HOSTNAME_URL: "https://cus.verila-bg.com"
+        KC_HOSTNAME_URL: "https://cus.verila-bg.com"
   script:
     - source cache.env
     - |
-      export KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> cache.env
+      export KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/auth >> cache.env
       git fetch --all
       devops/pipelines/build/docker-tmp.sh
       docker-compose config
