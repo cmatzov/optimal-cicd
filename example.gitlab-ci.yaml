@@ -99,10 +99,10 @@ Clear Test environment:
   needs:
    - Select Test Machine
 
-Rollback Stage:
-  extends: .rollback-stage
-  stage: rollback
+# Rollback Stage:
+#   extends: .rollback-stage
+#   stage: rollback
 
-Rollback Prod:
-  extends: .rollback-prod
-  stage: rollback
+# Rollback Prod:
+#   extends: .rollback-prod
+#   stage: rollback
