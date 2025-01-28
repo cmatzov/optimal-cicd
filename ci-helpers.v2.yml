@@ -121,7 +121,7 @@
       echo "The created tag is "$TAG""
       export TAG="$TAG" > cache.env
   rules:
-    if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
   cache:
     paths:
       - cache.env
