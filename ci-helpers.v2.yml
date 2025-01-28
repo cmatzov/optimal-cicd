@@ -102,7 +102,7 @@
 
 .hotfix-build-tag:
   tags: 
-    - optimal-novus-runner
+    - $RUNNER
   environment:
     name: $environment
   script: 
