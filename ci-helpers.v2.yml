@@ -134,18 +134,18 @@
   environment:
     name: $environment
   rules:
-    - if: '$environment == "test" && $PROJECT == "kti"'
+    - if: '$PROJECT == "kti" && $environment == "test"'
       variables:
         KC_HOSTNAME_URL: "https://kti.uat.optim-al.com"
-    - if: '$environment == "stage" && $PROJECT == "kti"'
+    - if: '$PROJECT == "kti" && $environment == "stage"'
       variables:
         KC_HOSTNAME_URL: "https://testmrp.ktinternational.eu"
         KC_ADMIN_USER: "mrpadmin"
         KC_ADMIN_PASS: "Plovdiv@2024"
-    - if: '$environment == "production" && $PROJECT == "ikea"'
+    - if: '$PROJECT == "ikea" && $environment == "production"'
       variables:
         KC_HOSTNAME_URL: "https://ikea.optim-al.com"
-    - if: '$environment == "production" && $PROJECT == "verila"'
+    - if: '$PROJECT == "verila" && $environment == "production"'
       variables:
         KC_HOSTNAME_URL: "https://cus.verila-bg.com"
   script:
