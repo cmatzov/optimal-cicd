@@ -78,24 +78,24 @@
         PATCH=0
         NEW_TAG="$MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
         echo $NEW_TAG
-        export environment="production" > cache.env
+        echo 'environment="production"' > cache.env
       elif [[ "$CI_COMMIT_BRANCH" =~ .+\/hotfix\/.+ ]]; then
         PATCH=$((PATCH + 1))
         NEW_TAG="MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
         echo $NEW_TAG
-        export environment="production" > cache.env
+        echo 'environment="production"' > cache.env
       elif [[ "$CI_COMMIT_BRANCH" == "develop" || "$CI_COMMIT_BRANCH" =~ .+\/release\/.+ ]]; then
         MINOR=$((MINOR + 1))
         PATCH=0
         NEW_TAG="$MAJOR.$MINOR.$PATCH-rc-$PROJ_PREFIX"
         echo $NEW_TAG
-        export environment="stage" > cache.env
+        echo 'environment="stage"' > cache.env
       else
         NEW_TAG="$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')"
       fi
-      export "TAG=$NEW_TAG" >> cache.env
+      echo "TAG=$NEW_TAG" >> cache.env
       if [[ "$PROJECT" == "kti" ]] 
-        export "VERSION=$TAG" >> cache.env
+        echo "VERSION=$TAG" >> cache.env
       fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
@@ -119,7 +119,7 @@
       PATCH=$((PATCH + 1))
       TAG="$MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
       echo "The created tag is "$TAG""
-      export TAG="$TAG" > cache.env
+      echo 'TAG="$TAG"' > cache.env
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
   cache:
@@ -132,8 +132,6 @@
   environment:
     name: $environment
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
     - if: '$environment == "test" && $PROJECT == "kti"'
       variables:
         KC_HOSTNAME_URL: "https://kti.uat.optim-al.com"
@@ -151,7 +149,7 @@
   script:
     - source cache.env
     - |
-      export KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> cache.env
+      echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
       git fetch --all
       devops/pipelines/build/docker-tmp.sh
       docker-compose config
