@@ -149,7 +149,7 @@
       variables:
         KC_HOSTNAME_URL: "https://cus.verila-bg.com"
   script:
-    - eval $(cat cache.env)
+    - export $(cat cache.env | xargs -d \n)
     - |
       export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
