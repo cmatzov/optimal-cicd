@@ -98,7 +98,7 @@
         export "VERSION=$TAG" >> cache.env
       fi
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ("$DEPLOY_IKEA" == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
   cache:
     paths:
       - cache.env
@@ -132,7 +132,8 @@
   environment:
     name: $environment
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ("$DEPLOY_IKEA" == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true" || "$HOTFIX_DEPLOYMENT" == "true")'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
     - if: '$environment == "test" && $PROJECT == "kti"'
       variables:
         KEYCLOAK_HOSTNAME_URL: "https://kti.uat.optim-al.com"
