@@ -120,7 +120,7 @@
       PATCH=$((PATCH + 1))
       TAG="$MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
       echo "The created tag is "$TAG""
-      echo 'TAG="$TAG"' > cache.env
+      echo "TAG=$TAG" >> cache.env
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
   cache:
@@ -151,6 +151,7 @@
   script:
     - eval $(cat cache.env)
     - |
+      export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
       git fetch --all
       devops/pipelines/build/docker-tmp.sh
