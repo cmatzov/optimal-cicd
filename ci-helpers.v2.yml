@@ -100,6 +100,7 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
   cache:
+    key: $CI_PIPELINE_ID
     paths:
       - cache.env
 
@@ -123,6 +124,7 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
   cache:
+    key: $CI_PIPELINE_ID
     paths:
       - cache.env
 
@@ -147,7 +149,7 @@
       variables:
         KC_HOSTNAME_URL: "https://cus.verila-bg.com"
   script:
-    - source cache.env
+    - eval $(cache.env)
     - |
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
       git fetch --all
@@ -156,6 +158,7 @@
 #      docker-compose build
 #      docker-compose push
   cache:
+    key: $CI_PIPELINE_ID
     paths:
       - cache.env
 
