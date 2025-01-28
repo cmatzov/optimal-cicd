@@ -117,7 +117,7 @@
       MINOR=${tag_components[1]}
       PATCH=${tag_components[2]}
       PATCH=$((PATCH + 1))
-      TAG="MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
+      TAG="$MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
       echo "The created tag is "$TAG""
       export TAG="$TAG" > cache.env
   rules:
@@ -151,7 +151,7 @@
   script:
     - source cache.env
     - |
-      export KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/auth >> cache.env
+      export KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH} >> cache.env
       git fetch --all
       devops/pipelines/build/docker-tmp.sh
       docker-compose config
