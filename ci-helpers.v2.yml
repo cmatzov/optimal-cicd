@@ -143,8 +143,7 @@
         ["verila:production"]="https://ikea.optim-al.com"
       )
     - KEY="$PROJECT:$environment"
-    - KC_HOSTNAME_URL="${HOST_LOOKUP[$KEY]}"
-    - echo "$KC_HOSTNAME_URL"
+    - export KC_HOSTNAME_URL="${HOST_LOOKUP[$KEY]}"
     - echo "KC_HOSTNAME_URL=${KC_HOSTNAME_URL}" >> cache.env
     - |
       case $KEY in 
