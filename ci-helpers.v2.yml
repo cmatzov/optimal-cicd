@@ -94,9 +94,6 @@
         NEW_TAG="$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')"
       fi
       echo "TAG=$NEW_TAG" >> cache.env
-      if [[ "$PROJECT" == "kti" ]] 
-        echo "VERSION=$TAG" >> cache.env
-      fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
   cache:
@@ -135,6 +132,25 @@
     name: $environment
   script:
     - export $(cat cache.env | xargs -d \n)
+    - |
+      if [[ "$PROJECT" == "kti" ]] 
+        echo "VERSION=$TAG" >> cache.env
+      fi
+    - |
+      declare -A HOST_LOOKUP=(
+        ["kti:stage"]="https://testmrp.ktinternational.eu"
+        ["ikea:production"]="https://ikea.optim-al.com"
+        ["verila:production"]="https://ikea.optim-al.com"
+      )
+    - KEY="$PROJECT:$environment"
+    - KC_HOSTNAME_URL="${HOST_LOOKUP[$KEY]}"
+    - echo "KC_HOSTNAME_URL=${KC_HOSTNAME_URL}" >> cache.env
+    - |
+      case $KEY in 
+        "kti:stage")
+          export KC_ADMIN_USER="mrpadmin" && echo "KC_ADMIN_USER=mrpadmin"
+          export KC_ADMIN_PASS="Plovdiv@2024" && echo "KC_ADMIN_PASS=Plovdiv@2024" ;;
+      esac ;;
     - |
       export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
