@@ -134,7 +134,7 @@
     - export $(cat cache.env | xargs -d \n)
     - |
       if [[ "$PROJECT" == "kti" ]]; then
-        echo "VERSION=$TAG" >> cache.env
+        export VERSION="$TAG" && echo "VERSION=$TAG" >> cache.env
       fi
     - |
       declare -A HOST_LOOKUP=(
