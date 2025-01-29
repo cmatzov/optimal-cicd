@@ -134,7 +134,7 @@
           if [[ "$environment" == "stage" ]]; then
             echo "KC_ADMIN_USER=mrpadmin" >> cache.env
             echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
-            echo 'KC_HOSTNAME_URL="https://testmrp.ktinternational.eu"' >> cache.env
+            echo "KC_HOSTNAME_URL=https://testmrp.ktinternational.eu" >> cache.env
           elif [[ "$environment" == "test" ]]; then
             echo "KC_HOSTNAME_URL=https://kti.uat.optim-al.com"
           else
@@ -142,11 +142,11 @@
           fi ;;
         ikea)
           if [[ "$environment" == "production" ]]; then
-            echo "KC_HOSTNAME_URL=https://ikea.optim-al.com"
+            echo "KC_HOSTNAME_URL=https://ikea.optim-al.com" >> cache.env
           fi ;;
         verila)
           if [[ "$environment" == "production" ]]; then
-            echo "KC_HOSTNAME_URL=https://cus.verila-bg.com"
+            echo "KC_HOSTNAME_URL=https://cus.verila-bg.com" >> cache.env
           fi ;;
       esac
   tags:
