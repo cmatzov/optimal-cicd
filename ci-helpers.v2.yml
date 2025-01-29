@@ -130,7 +130,7 @@
     - |
       case $PROJECT in
         kti)
-          export VERSION="$TAG" && echo "VERSION=$TAG" >> cache.env
+          echo "VERSION=$TAG" >> cache.env
           if [[ "$environment" == "stage" ]]; then
             echo "KC_ADMIN_USER=mrpadmin" >> cache.env
             echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
