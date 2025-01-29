@@ -136,7 +136,7 @@
             echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
             echo "KC_HOSTNAME_URL=https://testmrp.ktinternational.eu" >> cache.env
           elif [[ "$environment" == "test" ]]; then
-            echo "KC_HOSTNAME_URL=https://kti.uat.optim-al.com"
+            echo "KC_HOSTNAME_URL=https://kti.uat.optim-al.com" >> cache.env
           else
             echo "Invalid environment for KTI"
             exit 1
