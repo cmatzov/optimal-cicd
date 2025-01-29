@@ -126,31 +126,35 @@
       - cache.env
 
 .build-step:
+  before_script:
+    - |
+      case $PROJECT in
+        kti)
+          export VERSION="$TAG" && echo "VERSION=$TAG" >> cache.env
+          if [[ "$environment" == "stage" ]]; then
+            echo "KC_ADMIN_USER=mrpadmin" >> cache.env
+            echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
+            echo "KC_HOSTNAME_URL=https://testmrp.ktinternational.eu"
+          elif [[ "$environment" == "test" ]]; then
+            echo "KC_HOSTNAME_URL=https://kti.uat.optim-al.com"
+          else
+            echo "Invalid environment for KTI"
+          fi ;;
+        ikea)
+          if [[ "$environment" == "production" ]]; then
+            echo "KC_HOSTNAME_URL=https://ikea.optim-al.com"
+          fi ;;
+        verila)
+          if [[ "$environment" == "production" ]]; then
+            echo "KC_HOSTNAME_URL=https://cus.verila-bg.com"
+          fi ;;
+      esac
   tags:
     - $RUNNER
   environment:
     name: $environment
   script:
     - export $(cat cache.env | xargs -d \n)
-    - |
-      if [[ "$PROJECT" == "kti" ]]; then
-        export VERSION="$TAG" && echo "VERSION=$TAG" >> cache.env
-      fi
-    - |
-      declare -A HOST_LOOKUP=(
-        ["kti:stage"]="https://testmrp.ktinternational.eu"
-        ["ikea:production"]="https://ikea.optim-al.com"
-        ["verila:production"]="https://cus.verila-bg.com"
-      )
-    - KEY="$PROJECT:$environment"
-    - export KC_HOSTNAME_URL="${HOST_LOOKUP[$KEY]}"
-    - echo "KC_HOSTNAME_URL=${KC_HOSTNAME_URL}" >> cache.env
-    - |
-      case $KEY in 
-        "kti:stage")
-          export KC_ADMIN_USER="mrpadmin" && echo "KC_ADMIN_USER=mrpadmin"
-          export KC_ADMIN_PASS="Plovdiv@2024" && echo "KC_ADMIN_PASS=Plovdiv@2024" ;;
-      esac
     - |
       export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
