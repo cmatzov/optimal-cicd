@@ -140,7 +140,7 @@
       declare -A HOST_LOOKUP=(
         ["kti:stage"]="https://testmrp.ktinternational.eu"
         ["ikea:production"]="https://ikea.optim-al.com"
-        ["verila:production"]="https://ikea.optim-al.com"
+        ["verila:production"]="https://cus.verila-bg.com"
       )
     - KEY="$PROJECT:$environment"
     - export KC_HOSTNAME_URL="${HOST_LOOKUP[$KEY]}"
