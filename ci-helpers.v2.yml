@@ -93,6 +93,7 @@
       else
         NEW_TAG="$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')"
       fi
+      echo "$NEW_TAG"
       echo "TAG=$NEW_TAG" >> cache.env
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
