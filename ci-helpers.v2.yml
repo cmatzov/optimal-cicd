@@ -134,7 +134,7 @@
           if [[ "$environment" == "stage" ]]; then
             echo "KC_ADMIN_USER=mrpadmin" >> cache.env
             echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
-            echo "KC_HOSTNAME_URL=https://testmrp.ktinternational.eu" >> cache.env
+            echo 'KC_HOSTNAME_URL="https://testmrp.ktinternational.eu"' >> cache.env
           elif [[ "$environment" == "test" ]]; then
             echo "KC_HOSTNAME_URL=https://kti.uat.optim-al.com"
           else
