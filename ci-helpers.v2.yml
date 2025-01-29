@@ -154,7 +154,7 @@
   environment:
     name: $environment
   script:
-    - export $(cat cache.env | xargs -d \n)
+    - export $(cat cache.env | xargs)
     - |
       export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
