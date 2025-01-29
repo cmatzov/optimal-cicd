@@ -150,7 +150,7 @@
         "kti:stage")
           export KC_ADMIN_USER="mrpadmin" && echo "KC_ADMIN_USER=mrpadmin"
           export KC_ADMIN_PASS="Plovdiv@2024" && echo "KC_ADMIN_PASS=Plovdiv@2024" ;;
-      esac ;;
+      esac
     - |
       export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
       echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
