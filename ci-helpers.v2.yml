@@ -133,7 +133,7 @@
   script:
     - export $(cat cache.env | xargs -d \n)
     - |
-      if [[ "$PROJECT" == "kti" ]] 
+      if [[ "$PROJECT" == "kti" ]]; then
         echo "VERSION=$TAG" >> cache.env
       fi
     - |
