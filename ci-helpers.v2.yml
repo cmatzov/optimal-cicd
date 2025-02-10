@@ -145,6 +145,8 @@
             echo "KC_HOSTNAME_URL=https://kti.uat.optim-al.com" >> cache.env
             echo "KC_RELATIVE_PATH=auth" >> cache.env
           elif [[ "$environment" == "production" ]]; then
+            echo "KC_ADMIN_USER=mrpadmin" >> cache.env
+            echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
             echo "KC_HOSTNAME_URL=https://mrp.ktinternational.eu" >> cache.env
             echo "KC_RELATIVE_PATH=auth" >> cache.env
           else
