@@ -22,7 +22,7 @@
       changes:
         - net/**/*
   tags:
-    - $RUNNER
+    - optimal-novus-runner
   image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
     - cd ./net
@@ -45,7 +45,7 @@
       changes:
         - js/**/*
   tags:
-    - $RUNNER
+    - optimal-novus-runner
   image: node:16
   script:
     - cd js
