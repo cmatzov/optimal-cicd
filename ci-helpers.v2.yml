@@ -1,0 +1,286 @@
+.clear-test-and-db-restore:
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_CLEAR == "yes"'
+  tags: 
+    - optimal-novus-runner
+  script:
+    - /automations/runner/clear-test-and-db-restore.sh
+
+.ikea-daily-backups:
+  tags:
+    - optimal-novus-runner
+  environment:
+    name: stage
+  rules: 
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $BACKUPS == "yes"'
+  script:
+    - /automations/runner/ikea-daily-backups.sh
+
+.analyze-backend:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
+      changes:
+        - net/**/*
+  tags:
+    - $RUNNER
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - cd ./net
+    - dotnet tool restore
+    - dotnet build
+    - dotnet roslynator analyze > roslynator.txt
+    - cat roslynator.txt | grep "^0 diagnostics found$" 
+    - dotnet jb inspectcode -o=inspectcode.xml -f="xml" --no-build Optimal.Novus.sln && grep "<Issues/>" ./inspectcode.xml
+  artifacts:
+    paths:
+      - net/inspectcode.xml
+      - net/roslynator.txt
+    expire_in: 1 day
+    when: always
+  allow_failure: true
+
+.analyze-frontend:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule" && $CI_COMMIT_TAG == null'
+      changes:
+        - js/**/*
+  tags:
+    - $RUNNER
+  image: node:16
+  script:
+    - cd js
+    - npm install
+    - npm install -g expo-cli
+    - cd packages/mobile
+    - npm run install:mobile
+    - cd ../..
+    - npm run lint > fe-lint.txt
+  artifacts:
+    paths:
+      - js/fe-lint.txt
+    expire_in: 1 day
+    when: always
+  allow_failure: true
+
+.create-tag-and-select-environment:
+  tags:
+    - $RUNNER
+  script:
+    - |
+      PROJ_PREFIX="${PROJECT:0:2}"; PROJ_PREFIX="${PROJ_PREFIX^^}"
+      LAST_TAG=$(git tag -l "*-$PROJECT" | sort -V | tail -1)
+      IFS='-.' read -r -a tag_components <<< "$LAST_TAG"
+      MAJOR=${tag_components[0]}
+      MINOR=${tag_components[1]}
+      PATCH=${tag_components[2]}
+      if [[ "$CI_COMMIT_BRANCH" == "master" ]]; then
+        MINOR=$((MINOR + 1))
+        PATCH=0
+        NEW_TAG="$MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
+        echo $NEW_TAG
+        echo 'environment="production"' > cache.env
+      elif [[ "$CI_COMMIT_BRANCH" =~ .+\/hotfix\/.+ ]]; then
+        PATCH=$((PATCH + 1))
+        NEW_TAG="MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
+        echo $NEW_TAG
+        echo 'environment="production"' > cache.env
+      elif [[ "$CI_COMMIT_BRANCH" == "develop" || "$CI_COMMIT_BRANCH" =~ .+\/release\/.+ ]]; then
+        MINOR=$((MINOR + 1))
+        PATCH=0
+        NEW_TAG="$MAJOR.$MINOR.$PATCH-rc-$PROJ_PREFIX"
+        echo $NEW_TAG
+        echo 'environment="stage"' > cache.env
+      else
+        NEW_TAG="$(echo "$CI_COMMIT_BRANCH" | sed 's/\//-/g')"
+        echo 'environment="test"' > cache.env
+      fi
+      echo "$NEW_TAG"
+      echo "TAG=$NEW_TAG" >> cache.env
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
+  cache:
+    key: $CI_PIPELINE_ID
+    paths:
+      - cache.env
+
+.hotfix-build-tag:
+  tags: 
+    - $RUNNER
+  environment:
+    name: $environment
+  script: 
+    - |
+      PROJ_PREFIX="${PROJECT:0:2}"; PROJ_PREFIX="${PROJ_PREFIX^^}"
+      LAST_TAG=$(git tag -l "*-$PROJ_PREFIX" | sort -V | tail -1)
+      IFS='-.' read -r -a tag_components <<< "$LAST_TAG"
+      MAJOR=${tag_components[0]}
+      MINOR=${tag_components[1]}
+      PATCH=${tag_components[2]}
+      PATCH=$((PATCH + 1))
+      TAG="$MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
+      echo "The created tag is "$TAG""
+      echo "TAG=$TAG" >> cache.env
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
+  cache:
+    key: $CI_PIPELINE_ID
+    paths:
+      - cache.env
+
+.build-step:
+  tags:
+    - $RUNNER
+  environment:
+    name: $environment
+  before_script:
+    - |
+      case $PROJECT in
+        kti)
+          echo "VERSION=$TAG" >> cache.env
+          if [[ "$environment" == "stage" ]]; then
+            echo "KC_ADMIN_USER=mrpadmin" >> cache.env
+            echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
+            echo "KC_HOSTNAME_URL=https://testmrp.ktinternational.eu" >> cache.env
+          elif [[ "$environment" == "test" ]]; then
+            echo "KC_HOSTNAME_URL=https://kti.uat.optim-al.com" >> cache.env
+            echo "KC_RELATIVE_PATH=auth" >> cache.env
+          elif [[ "$environment" == "production" ]]; then
+            echo "KC_ADMIN_USER=mrpadmin" >> cache.env
+            echo "KC_ADMIN_PASS=Plovdiv@2024" >> cache.env
+            echo "KC_HOSTNAME_URL=https://mrp.ktinternational.eu" >> cache.env
+            echo "KC_RELATIVE_PATH=auth" >> cache.env
+          else
+            echo "Invalid environment for KTI"
+            exit 1
+          fi ;;
+        ikea)
+          if [[ "$environment" == "production" ]]; then
+            echo "KC_HOSTNAME_URL=https://ikea.optim-al.com" >> cache.env
+          fi ;;
+        verila)
+          if [[ "$environment" == "production" ]]; then
+            echo "KC_HOSTNAME_URL=https://cus.verila-bg.com" >> cache.env
+          fi ;;
+      esac
+  script:
+    - export $(cat cache.env | xargs)
+    - |
+      export "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}"
+      echo "KC_EXTERNAL_URL=${KC_HOSTNAME_URL}/${KC_RELATIVE_PATH}" >> cache.env
+      git fetch --all
+      devops/pipelines/build/docker-tmp.sh
+      docker-compose config
+#      docker-compose build
+#      docker-compose push
+#      if [[ "$environment == "production" || $environment == "stage" ]]; then
+#        curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+#      fi
+  cache:
+    key: $CI_PIPELINE_ID
+    paths:
+      - cache.env
+
+.build-biovet-service-artifacts:
+  tags: 
+    - $BIOVET_RUNNER
+  before_script:
+    - /automations/runner/buildkit.sh
+  script:
+    - |
+      export VERSION=$CI_PIPELINE_ID
+      if [[ $DEPLOY_BIOVET_STAGE == "yes" ]]; then
+        export ENVIRONMENT="stage"
+      elif [[ $DEPLOY_BIOVET == "yes" ]]; then
+        export ENVIRONMENT="test"
+      else
+        echo "How did you trigger this job anyway, slick?"
+      fi
+      if [[ "$UPDATE_MOBILE" == "false" && "$UPDATE_OFFICE" == "true" ]]; then
+        mkdir -p /var/automations/biovet/tmp/office && chmod 755 /var/automations/biovet/tmp/office
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/office/office.tar -f Office/Repository/Dockerfile .
+        cd /var/automations/biovet/tmp/office && tar xf office.tar
+        cd app/office && tar -cf office-${VERSION}.tar ./* && curl -u "$REGISTRY_USER:$REGISTRY_PASSWORD" --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
+        cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/office
+      elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "false" ]]; then
+        mkdir -p /var/automations/biovet/tmp/mobile && chmod 755 /var/automations/biovet/tmp/mobile
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/mobile/mobile.tar -f Office/Repository/Dockerfile .
+        cd /var/automations/biovet/tmp/mobile && tar xf mobile.tar
+        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl -u "$REGISTRY_USER:$REGISTRY_PASSWORD" --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
+        cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/mobile
+      elif [[ "$UPDATE_MOBILE" == "true" && "$UPDATE_OFFICE" == "true" ]]; then
+        mkdir -p /var/automations/biovet/tmp/both && chmod 755 /var/automations/biovet/tmp/both
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target mobile --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/mobile.tar -f Office/Repository/Dockerfile .
+        ENABLE_DOCKER_BUILDKIT=1 docker buildx build --target office --build-arg environment=$ENVIRONMENT --build-arg version="0.0.${VERSION}.0" --output type=tar,dest=/var/automations/biovet/tmp/both/office.tar -f Office/Repository/Dockerfile .
+        cd /var/automations/biovet/tmp/both && tar xf mobile.tar && tar xf office.tar
+        cd app/mobile && tar -cf mobile-${VERSION}.tar ./* && curl -u "$REGISTRY_USER:$REGISTRY_PASSWORD" --upload-file mobile-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/mobile/mobile-${VERSION}.tar"
+        cd ../office && tar -cf office-${VERSION}.tar ./* && curl -u "$REGISTRY_USER:$REGISTRY_PASSWORD" --upload-file office-${VERSION}.tar "https://registry.optim-al.com/repository/veteris-artifacts/${ENVIRONMENT}/office/office-${VERSION}.tar"
+        cd /var/automations/biovet && rm -rf /var/automations/biovet/tmp/both
+      else
+        echo "You messed up the variables silly! Go again and check them! Set to true whatever you want to update and to false what you don't want to update! If you set them both to false then why are you running this job?"
+      fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes")'
+
+.rollback-biovet-services:
+  tags:
+    - $BIOVET_RUNNER
+  before_script:
+    - apk add jq
+  script:
+    - |
+      if [[ $ROLLBACK_BIOVET_STAGE == "true" ]]; then
+        export ENVIRONMENT="stage"
+      elif [[ $ROLLBACK_BIOVET == "true" ]]; then
+        export ENVIRONMENT="test"
+      else
+        echo "How did you trigger this job anyway, slick?"
+      fi
+      if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "false" ]]; then
+        LAST_MOBILE=$(/var/automations/biovet/last-id.sh mobile $ENVIRONMENT)
+        curl -X DELETE -u "$REGISTRY_USER:$REGISTRY_PASSWORD" "https://registry.optim-al.com/service/rest/v1/assets/${LAST_MOBILE}"
+      elif [[ "$ROLLBACK_MOBILE" == "false" && "$ROLLBACK_OFFICE" == "true" ]]; then
+        LAST_OFFICE=$(/var/automations/biovet/last-id.sh office $ENVIRONMENT)
+        curl -X DELETE -u "$REGISTRY_USER:$REGISTRY_PASSWORD" "https://registry.optim-al.com/service/rest/v1/assets/${LAST_OFFICE}"
+      elif [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
+        echo "Deploying former image..."
+      else
+        echo "How did you even mess this up? Check variables and branches and retry."
+      fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($ROLLBACK_BIOVET == "true" || $ROLLBACK_BIOVET_STAGE == "true")'
+
+.docker-build-biovet-repository:
+  tags: 
+    - $BIOVET_RUNNER
+  before_script:
+    - apk add jq
+  script:
+    - |
+      if [[ $DEPLOY_BIOVET_STAGE == "yes" || $ROLLBACK_BIOVET_STAGE == "true" ]]; then
+        export ENVIRONMENT="stage"
+        export LAST_TAG=$(/var/automations/biovet/repo-tag.sh deploy stage)
+        export TAG=$(/var/automations/biovet/versioning.sh $LAST_TAG)
+      elif [[ $DEPLOY_BIOVET == "yes" || $ROLLBACK_BIOVET == "true" ]]; then
+        export ENVIRONMENT="test"
+        export TAG=$CI_PIPELINE_ID
+      else
+        echo "How did you trigger this job anyway, slick?"
+      fi
+      if [[ "$ROLLBACK_MOBILE" == "true" && "$ROLLBACK_OFFICE" == "true" ]]; then
+        echo "Skipping the build step..."
+      else
+        LAST_MOBILE=$(/var/automations/biovet/last-tag.sh mobile $ENVIRONMENT)
+        LAST_OFFICE=$(/var/automations/biovet/last-tag.sh office $ENVIRONMENT)
+        echo $LAST_MOBILE $LAST_OFFICE
+        mkdir mobile && cd mobile
+        curl -u "$REGISTRY_USER:$REGISTRY_PASSWORD" -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_MOBILE}" && tar xf mobile-*.tar
+        cd ..
+        mkdir office && cd office
+        curl -u "$REGISTRY_USER:$REGISTRY_PASSWORD" -O "https://registry.optim-al.com/repository/veteris-artifacts/${LAST_OFFICE}" && tar xf office-*.tar
+        cd ..
+        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose build repository server gateway
+        ENVIRONMENT="${ENVIRONMENT}" TAG="${TAG}" GIT_BRANCH=${CI_COMMIT_BRANCH} GIT_COMMIT_ID=$(git show -s --format=%h) docker-compose push repository server gateway
+      fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_BIOVET == "yes" || $DEPLOY_BIOVET_STAGE == "yes")'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($ROLLBACK_BIOVET == "true" || $ROLLBACK_BIOVET_STAGE == "true")'
