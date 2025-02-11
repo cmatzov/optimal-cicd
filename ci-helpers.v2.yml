@@ -65,6 +65,16 @@
 .create-tag-and-select-environment:
   tags:
     - $RUNNER
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true"'
+      variables:
+        PROJECT: ikea
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true"'
+      variables:
+        PROJECT: verila
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true"'
+      variables:
+        PROJECT: kti
   script:
     - |
       PROJ_PREFIX="${PROJECT:0:2}"; PROJ_PREFIX="${PROJ_PREFIX^^}"
@@ -96,8 +106,6 @@
       fi
       echo "$NEW_TAG"
       echo "TAG=$NEW_TAG" >> cache.env
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true" || $DEPLOY_KTI == "true")'
   cache:
     key: $CI_PIPELINE_ID
     paths:
