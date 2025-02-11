@@ -1,12 +1,12 @@
 include:
   - project: 'devops-campus/ci-cd/ci-helpers'
-    ref: refactor-ci
+    ref: main
     file: 
-      - 'ci-helpers.yml'
+      - 'ci-helpers.v2.yml'
   - project: 'devops-campus/ci-cd/cd-helpers'
-    ref: refactor-cd
+    ref: main
     file: 
-      - 'cd-helpers.yml'
+      - 'cd-helpers.v2.yml'
   - project: 'optimal-projects/optimal/ci-automation'
     ref: main
     file:
@@ -52,38 +52,95 @@ Build Ikea:
   stage: build
   variables:
     PROJECT: "ikea"
+    environment: "test"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "ikea"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
+      variables:
+        environment: "production"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
+      variables:
+        environment: "stage"
 
 Build Verila:
   extends: .build-step
   stage: build
   variables:
     PROJECT: "verila"
+    environment: "test"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "verila"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
+      variables:
+        environment: "production"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
+      variables:
+        environment: "stage"
 
 Build KTI:
   extends: .build-step
   stage: build
   variables:
     PROJECT: "kti"
+    environment: "test"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "kti"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
+      variables:
+        environment: "production"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
+      variables:
+        environment: "stage"
 
 Select Test Machine:
   extends: .select-test-machine
   stage: select-test-machine
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true") && ($CI_COMMIT_BRANCH != "master" || $CI_COMMIT_BRANCH !~ ".+\/hotfix\/.+" || $CI_COMMIT_BRANCH != "develop" || $CI_COMMIT_BRANCH !~ ".+\/release\/.+")'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $environment == "test" && ($HOTFIX_DEPLOYMENT == "true" && $PROJECT == "ikea" || $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "verila")'
 
 Deploy Ikea:
   extends: .deploy-step
   stage: deploy
   needs:
-   - Build Ikea
+    - job: Select Test Machine
+      optional: true
+    - Build Ikea
   variables:
     PROJECT: "ikea"
+    environment: "test"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "ikea"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
+      variables:
+        environment: "production"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
+      variables:
+        environment: "stage"
 
 Deploy Verila:
   extends: .deploy-step
   stage: deploy
   needs:
-   - Build Verila
+    - job: Select Test Machine
+      optional: true
+    - Build Verila
   variables:
     PROJECT: "verila"
+    environment: "test"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "verila"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
+      variables:
+        environment: "production"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
+      variables:
+        environment: "stage"
 
 Deploy KTI:
   extends: .deploy-step
@@ -92,12 +149,27 @@ Deploy KTI:
     - Build KTI
   variables:
     PROJECT: "kti"
+    environment: "test"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "kti"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
+      variables:
+        environment: "production"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
+      variables:
+        environment: "stage"
 
 Clear Test environment:
   extends: .clear-test-environments
   stage: clear
   needs:
    - Select Test Machine
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($DEPLOY_IKEA == "true" || $DEPLOY_VERILA == "true") && ($CI_COMMIT_BRANCH != "master" || $CI_COMMIT_BRANCH !~ ".+\/hotfix\/.+" || $CI_COMMIT_BRANCH != "develop" || $CI_COMMIT_BRANCH !~ ".+\/release\/.+")'
+      when: manual
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $environment == "test" && ($HOTFIX_DEPLOYMENT == "true" && $PROJECT == "ikea" || $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "verila")'
+      when: manual
 
 # Rollback Stage:
 #   extends: .rollback-stage
