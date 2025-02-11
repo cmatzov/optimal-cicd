@@ -66,6 +66,12 @@
   tags:
     - $RUNNER
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
+      variables:
+        environment: "production"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
+      variables:
+        environment: "stage"
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_IKEA == "true"'
       variables:
         PROJECT: ikea
@@ -75,12 +81,6 @@
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_KTI == "true"'
       variables:
         PROJECT: kti
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
-      variables:
-        environment: "production"
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
-      variables:
-        environment: "stage"
   script:
     - |
       PROJ_PREFIX="${PROJECT:0:2}"; PROJ_PREFIX="${PROJ_PREFIX^^}"

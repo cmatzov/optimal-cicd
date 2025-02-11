@@ -133,14 +133,14 @@ Deploy Verila:
     PROJECT: "verila"
     environment: "test"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "verila"'
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true"'
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+")'
       variables:
         environment: "production"
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ ".+\/release\/.+")'
       variables:
         environment: "stage"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true" && $PROJECT == "verila"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DEPLOY_VERILA == "true"'
 
 Deploy KTI:
   extends: .deploy-step
