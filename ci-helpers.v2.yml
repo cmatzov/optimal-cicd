@@ -196,12 +196,12 @@
       git fetch --all
       devops/pipelines/build/docker-tmp.sh
       docker-compose config
-#      docker-compose build
-#      docker-compose push
-    # - |
-    #   if [[ "$environment == "production" || $environment == "stage" ]]; then
-    #     curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
-    #   fi
+      docker-compose build
+      docker-compose push
+    - |
+      if [[ "$environment == "production" || $environment == "stage" ]]; then
+        curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
+      fi
   cache:
     key: $CI_PIPELINE_ID
     paths:
