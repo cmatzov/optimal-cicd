@@ -63,6 +63,8 @@
   allow_failure: true
 
 .create-tag-and-select-environment:
+  environment:
+    name: $environment
   tags:
     - $RUNNER
   rules:
