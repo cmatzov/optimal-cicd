@@ -141,6 +141,7 @@
   environment:
     name: $environment
   before_script:
+    - export $(cat cache.env | xargs)
     - |
       case $PROJECT in
         kti)
