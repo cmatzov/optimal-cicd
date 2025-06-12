@@ -14,7 +14,8 @@
   rules: 
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $BACKUPS == "yes"'
   script:
-    - /automations/runner/ikea-daily-backups.sh
+    - /automations/runner/ikea-daily-backups.sh || true
+    - /automations/runner/verila-daily-backups.sh || true
 
 .analyze-backend:
   rules:
