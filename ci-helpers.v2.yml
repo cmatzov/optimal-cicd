@@ -6,6 +6,14 @@
   script:
     - /automations/runner/clear-test-and-db-restore.sh
 
+.internal-daily-backups:
+  tags:
+    - optimal-novus-runner
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $BACKUPS == "yes"'
+  script:
+    - /automations/runner/internal-daily-backups.sh
+
 .ikea-daily-backups:
   tags:
     - optimal-novus-runner
