@@ -148,8 +148,7 @@
       fi
       echo "$NEW_TAG"
       echo "TAG=$NEW_TAG" >> cache.env
-  cache:
-    key: $CI_PIPELINE_ID
+  artifacts:
     paths:
       - cache.env
 
@@ -172,8 +171,7 @@
       echo "TAG=$TAG" >> cache.env
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $HOTFIX_DEPLOYMENT == "true"'
-  cache:
-    key: $CI_PIPELINE_ID
+  artifacts:
     paths:
       - cache.env
 
@@ -182,6 +180,11 @@
     - $RUNNER
   environment:
     name: $environment
+  needs:
+    - job: .create-tag-and-select-environment
+      optional: true
+    - job: .hotfix-build-tag
+      optional: true
   before_script:
     - export $(cat cache.env | xargs)
     - |
@@ -227,8 +230,7 @@
       if [[ $environment == "production" || $environment == "stage" ]]; then
         curl -X POST "https://gitlab.optim-al.com/api/v4/projects/12/repository/tags?tag_name=${TAG}&ref=${CI_COMMIT_BRANCH}&release_description='.'&private_token=${GIT_PASSWD}" --form "variables[CI_SKIP]=true"
       fi
-  cache:
-    key: $CI_PIPELINE_ID
+  artifacts:
     paths:
       - cache.env
 
