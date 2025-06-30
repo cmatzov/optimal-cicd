@@ -93,15 +93,15 @@
   tags:
     - $RUNNER
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_IKEA == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_IKEA == "true"'
       variables:
         environment: "production"
         PROJECT: ikea
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_VERILA == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_VERILA == "true"'
       variables:
         environment: "production"
         PROJECT: verila
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_KTI == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_KTI == "true"'
       variables:
         environment: "production"
         PROJECT: kti
@@ -125,7 +125,7 @@
       MAJOR=${tag_components[0]}
       MINOR=${tag_components[1]}
       PATCH=${tag_components[2]}
-      if [[ "$CI_COMMIT_BRANCH" == "master" ]]; then
+      if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
         MINOR=$((MINOR + 1))
         PATCH=0
         NEW_TAG="$MAJOR.$MINOR.$PATCH-$PROJ_PREFIX"
