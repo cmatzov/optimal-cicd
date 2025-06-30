@@ -180,9 +180,6 @@
     - $RUNNER
   environment:
     name: $environment
-  dependencies:
-    - .create-tag-and-select-environment
-    - .hotfix-build-tag
   before_script:
     - export $(cat cache.env | xargs)
     - |
