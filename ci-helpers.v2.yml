@@ -117,6 +117,14 @@
       variables:
         environment: "stage"
         PROJECT: kti
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_COMMIT_BRANCH != ".+\/release\/.+" && $CI_COMMIT_BRANCH != ".+\/hotfix\/.+") && $DEPLOY_IKEA == "true"'
+      variables:
+        environment: "test"
+        PROJECT: ikea
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH != "develop" && $CI_COMMIT_BRANCH != "master" && $CI_COMMIT_BRANCH != ".+\/release\/.+" && $CI_COMMIT_BRANCH != ".+\/hotfix\/.+") && $DEPLOY_VERILA == "true"'
+      variables:
+        environment: "test"
+        PROJECT: verila
   script:
     - |
       PROJ_PREFIX="${PROJECT:0:2}"; PROJ_PREFIX="${PROJ_PREFIX^^}"
