@@ -97,7 +97,7 @@
       variables:
         environment: "production"
         PROJECT: ikea
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_VERILA == "true" $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH =~ ".+\/hotfix\/.+") && $DEPLOY_VERILA == "true" && $GITLAB_USER_LOGIN =~ $AUTHORIZED_USERS'
       variables:
         environment: "production"
         PROJECT: verila
