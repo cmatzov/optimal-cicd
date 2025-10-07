@@ -127,11 +127,8 @@
         PROJECT: verila
   script:
     - |
-      echo $PROJECT 
-
       PROJ_PREFIX="${PROJECT:0:2}"; PROJ_PREFIX="${PROJ_PREFIX^^}"
       LAST_TAG=$(git tag -l "*-$PROJ_PREFIX" | sort -V | tail -1)
-      echo $LAST_TAG
       IFS='-.' read -r -a tag_components <<< "$LAST_TAG"
       MAJOR=${tag_components[0]}
       MINOR=${tag_components[1]}
